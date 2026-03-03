@@ -2,6 +2,12 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CategoriesSection from "@/components/CategoriesSection";
 import FeaturedProducts from "@/components/FeaturedProducts";
+import TrendingDeals from "@/components/TrendingDeals";
+import NewArrivals from "@/components/NewArrivals";
+import StatsSection from "@/components/StatsSection";
+import WhyChooseUs from "@/components/WhyChooseUs";
+import BrandsSection from "@/components/BrandsSection";
+import Testimonials from "@/components/Testimonials";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 
@@ -12,6 +18,12 @@ const Index = () => {
       <HeroSection />
       <CategoriesSection />
       <FeaturedProducts />
+      <TrendingDeals />
+      <NewArrivals />
+      <StatsSection />
+      <WhyChooseUs />
+      <BrandsSection />
+      <Testimonials />
       <CTASection />
       <Footer />
     </div>
