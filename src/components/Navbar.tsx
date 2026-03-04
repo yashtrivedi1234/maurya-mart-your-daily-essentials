@@ -1,6 +1,7 @@
 import { ShoppingCart, Menu, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -41,7 +42,7 @@ const Navbar = () => {
               0
             </span>
           </Button>
-          <Button size="sm">Sign In</Button>
+          <Button size="sm" asChild><Link to="/login">Sign In</Link></Button>
         </div>
 
         <Button
@@ -65,7 +66,7 @@ const Navbar = () => {
               {link}
             </a>
           ))}
-          <Button className="w-full mt-3" size="sm">Sign In</Button>
+          <Button className="w-full mt-3" size="sm" asChild><Link to="/login">Sign In</Link></Button>
         </div>
       )}
     </nav>
