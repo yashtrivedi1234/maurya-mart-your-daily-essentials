@@ -1,4 +1,3 @@
-import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CategoriesSection from "@/components/CategoriesSection";
 import FeaturedProducts from "@/components/FeaturedProducts";
@@ -9,13 +8,11 @@ import WhyChooseUs from "@/components/WhyChooseUs";
 import BrandsSection from "@/components/BrandsSection";
 import Testimonials from "@/components/Testimonials";
 import CTASection from "@/components/CTASection";
-import Footer from "@/components/Footer";
 import AnimatedSection from "@/components/AnimatedSection";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <>
       <HeroSection />
       <AnimatedSection>
         <CategoriesSection />
@@ -44,8 +41,7 @@ const Index = () => {
       <AnimatedSection>
         <CTASection />
       </AnimatedSection>
-      <Footer />
-    </div>
+    </>
   );
 };
 
