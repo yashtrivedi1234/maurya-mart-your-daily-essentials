@@ -70,8 +70,8 @@ const Footer = () => {
             © {new Date().getFullYear()} Maurya Mart. All rights reserved.
           </p>
           <p className="text-primary-foreground/50 text-sm mt-2 font-medium">
-            Created and Developed by{" "}
-            <span className="text-primary font-semibold">Yash Trivedi</span>
+            Digital Experience by{" "}
+            <span className="text-primary font-semibold">Yash & Shalu</span>
           </p>
         </div>
       </div>
