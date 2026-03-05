@@ -22,7 +22,7 @@ const Navbar = () => {
             <span className="text-primary-foreground font-bold text-lg">M</span>
           </div>
           <span className="font-display font-bold text-xl text-foreground">
-            Maurya<span className="text-primary">Mart</span>
+            Maur<span className="text-primary">Mart</span>
           </span>
         </a>
 

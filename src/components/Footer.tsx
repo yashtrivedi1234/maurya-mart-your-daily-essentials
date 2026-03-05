@@ -12,7 +12,7 @@ const Footer = () => {
               <div className="w-8 h-8 rounded-lg hero-gradient flex items-center justify-center">
                 <span className="text-primary-foreground font-bold">M</span>
               </div>
-              <span className="font-display font-bold text-lg">MauryaMart</span>
+              <span className="font-display font-bold text-lg">MaurMart</span>
             </div>
             <p className="text-primary-foreground/60 text-sm leading-relaxed">
               Your one-stop shop for daily essentials and electronics. Quality products at the best prices.
@@ -41,7 +41,7 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Contact Us</h4>
             <ul className="space-y-2 text-sm text-primary-foreground/60">
-              <li>📧 support@mauryamart.com</li>
+              <li>📧 support@maurmart.com</li>
               <li>📞 +91 98765 43210</li>
               <li>📍 India</li>
             </ul>
@@ -74,7 +74,7 @@ const Footer = () => {
 
         <div className="mt-12 pt-6 border-t border-primary-foreground/10 text-center">
           <p className="text-primary-foreground/40 text-sm">
-            © {new Date().getFullYear()} Maurya Mart. All rights reserved.
+            © {new Date().getFullYear()} Maur Mart. All rights reserved.
           </p>
           <p className="text-primary-foreground/50 text-sm mt-2 font-medium">
             Digital Experience by{" "}

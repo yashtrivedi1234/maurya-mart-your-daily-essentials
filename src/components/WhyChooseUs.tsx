@@ -15,7 +15,7 @@ const WhyChooseUs = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-3">
-            Why Choose Maurya Mart?
+            Why Choose Maur Mart?
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto">
             We go the extra mile to make your shopping experience seamless, secure, and satisfying

@@ -37,7 +37,7 @@ const Login = () => {
               <span className="text-primary-foreground font-bold text-xl">M</span>
             </div>
             <span className="font-display font-bold text-2xl text-primary-foreground">
-              Maurya<span className="opacity-80">Mart</span>
+              Maur<span className="opacity-80">Mart</span>
             </span>
           </a>
           <h1 className="text-4xl font-display font-bold text-primary-foreground leading-tight mb-4">
@@ -72,7 +72,7 @@ const Login = () => {
                 <span className="text-primary-foreground font-bold text-lg">M</span>
               </div>
               <span className="font-display font-bold text-xl text-foreground">
-                Maurya<span className="text-primary">Mart</span>
+                Maur<span className="text-primary">Mart</span>
               </span>
             </div>
             <h2 className="text-2xl font-display font-bold text-foreground">
@@ -81,7 +81,7 @@ const Login = () => {
             <p className="text-muted-foreground mt-1">
               {isSignUp
                 ? "Sign up to start shopping"
-                : "Sign in to your MauryaMart account"}
+                : "Sign in to your MaurMart account"}
             </p>
           </div>
 
