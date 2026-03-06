@@ -7,11 +7,13 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { mockProducts } from "@/data/mockProducts";
 import ProductCard from "@/components/shop/ProductCard";
+import { useCart } from "@/contexts/CartContext";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCart();
 
   const product = mockProducts.find((p) => p.id === id);
 
@@ -34,6 +36,7 @@ const ProductDetail = () => {
     .slice(0, 4);
 
   const handleAddToCart = () => {
+    addItem(product, quantity);
     toast.success(`${quantity}x ${product.name} added to cart!`);
   };
 
