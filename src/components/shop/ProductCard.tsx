@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/data/mockProducts";
 import { toast } from "sonner";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
   product: Product;
@@ -14,7 +15,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
+  const { addItem } = useCart();
+
   const handleAddToCart = () => {
+    addItem(product);
     toast.success(`${product.name} added to cart!`);
   };
 
