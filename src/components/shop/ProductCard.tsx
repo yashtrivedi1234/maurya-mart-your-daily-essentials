@@ -1,4 +1,5 @@
 import { Star, ShoppingCart, Eye } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/data/mockProducts";
@@ -95,8 +96,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <ShoppingCart className="h-3.5 w-3.5" />
             Add to Cart
           </Button>
-          <Button size="sm" variant="outline" className="px-3">
-            <Eye className="h-3.5 w-3.5" />
+          <Button size="sm" variant="outline" className="px-3" asChild>
+            <Link to={`/shop/${product.id}`}>
+              <Eye className="h-3.5 w-3.5" />
+            </Link>
           </Button>
         </div>
       </div>
