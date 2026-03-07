@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import SearchOverlay from "@/components/SearchOverlay";
+import logo from "../assets/logo.webp";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -25,12 +26,7 @@ const Navbar = () => {
       <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 flex items-center justify-between h-16">
           <a href="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg hero-gradient flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">M</span>
-            </div>
-            <span className="font-display font-bold text-xl text-foreground">
-              Maur<span className="text-primary">Mart</span>
-            </span>
+            <img src={logo} alt="Maurya Mart Logo" className="h-14 w-auto" />
           </a>
 
           <div className="hidden md:flex items-center gap-8">

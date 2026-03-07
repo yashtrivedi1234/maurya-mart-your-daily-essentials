@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import logo from "../assets/logo.webp";
 
 const Footer = () => {
   return (
@@ -9,10 +10,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg hero-gradient flex items-center justify-center">
-                <span className="text-primary-foreground font-bold">M</span>
-              </div>
-              <span className="font-display font-bold text-lg">MaurMart</span>
+              <img src={logo} alt="Maurya Mart Logo" className="h-14 w-auto brightness-0 invert" />
             </div>
             <p className="text-primary-foreground/60 text-sm leading-relaxed">
               Your one-stop shop for daily essentials and electronics. Quality products at the best prices.
