@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Smartphone, UtensilsCrossed, Shirt, Sparkles, Home, Headphones } from "lucide-react";
 
 const categories = [
