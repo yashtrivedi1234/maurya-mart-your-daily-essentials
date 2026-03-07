@@ -1,10 +1,11 @@
-import { Star, ShoppingCart, Eye } from "lucide-react";
+import { Star, ShoppingCart, Eye, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/data/mockProducts";
 import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 interface ProductCardProps {
   product: Product;
@@ -16,10 +17,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
     : 0;
 
   const { addItem } = useCart();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
+  const wishlisted = isInWishlist(product.id);
 
   const handleAddToCart = () => {
     addItem(product);
     toast.success(`${product.name} added to cart!`);
+  };
+
+  const toggleWishlist = () => {
+    if (wishlisted) {
+      removeFromWishlist(product.id);
+      toast.info(`${product.name} removed from wishlist`);
+    } else {
+      addToWishlist(product);
+      toast.success(`${product.name} added to wishlist!`);
+    }
   };
 
   return (
@@ -37,6 +50,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
             -{discount}%
           </Badge>
         )}
+        <button
+          onClick={toggleWishlist}
+          className="absolute top-3 right-3 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-background"
+        >
+          <Heart className={`h-4 w-4 ${wishlisted ? "fill-destructive text-destructive" : "text-muted-foreground"}`} />
+        </button>
         {!product.inStock && (
           <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center">
             <span className="text-primary-foreground font-semibold text-sm bg-foreground/80 px-3 py-1 rounded-full">
