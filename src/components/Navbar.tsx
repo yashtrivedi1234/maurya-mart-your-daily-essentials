@@ -13,7 +13,7 @@ const Navbar = () => {
   const links = [
     { label: "Home", to: "/" },
     { label: "Shop", to: "/shop" },
-    { label: "Categories", to: "#" },
+    { label: "Categories", to: "/categories" },
     { label: "About", to: "#" },
     { label: "Contact", to: "#" },
   ];
