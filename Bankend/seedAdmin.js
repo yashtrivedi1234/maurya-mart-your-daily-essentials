@@ -10,8 +10,8 @@ const seedAdmin = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("MongoDB Connected ✅");
 
-    const adminEmail = "skumari57883@gmail.com";
-    const adminPassword = "shalu#2004";
+    const adminEmail = process.env.ADMIN_EMAIL || "skumari57883@gmail.com";
+    const adminPassword = process.env.ADMIN_PASSWORD || "shalu#2004";
 
     // Check if user already exists
     let adminUser = await User.findOne({ email: adminEmail });

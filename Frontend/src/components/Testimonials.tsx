@@ -27,7 +27,7 @@ const testimonials = [
     role: "Verified Buyer",
     avatar: "🧑",
     rating: 5,
-    text: "The organic tea collection is outstanding. Fresh, well-packaged, and delivered right on time. Will keep ordering from Maurya Mart!",
+    text: "The organic tea collection is outstanding. Fresh, well-packaged, and delivered right on time. Will keep ordering from Maur Mart!",
   },
 ];
 

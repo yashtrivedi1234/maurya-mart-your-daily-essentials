@@ -28,10 +28,15 @@ export const getHeroSlides = async (req, res) => {
 // @access  Private/Admin
 export const createHeroSlide = async (req, res) => {
   try {
-    const { image, badge, heading, highlight, sub } = req.body;
+    const { badge, heading, highlight, sub } = req.body;
     
+    let imageUrl = req.body.image;
+    if (req.file) {
+      imageUrl = `http://localhost:5001/uploads/${req.file.filename}`;
+    }
+
     const slide = new HeroSlide({
-      image,
+      image: imageUrl,
       badge,
       heading,
       highlight,
@@ -57,6 +62,34 @@ export const deleteHeroSlide = async (req, res) => {
       res.json({ message: "Slide removed" });
     } else {
       res.status(404).json({ message: "Slide not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// @desc    Update a hero slide
+// @route   PUT /api/heroes/:id
+// @access  Private/Admin
+export const updateHeroSlide = async (req, res) => {
+  try {
+    const slide = await HeroSlide.findById(req.params.id);
+
+    if (slide) {
+        if (req.file) {
+            slide.image = `http://localhost:5001/uploads/${req.file.filename}`;
+        } else if (req.body.image) {
+            slide.image = req.body.image;
+        }
+
+        slide.badge = req.body.badge || slide.badge;
+        slide.heading = req.body.heading || slide.heading;
+        slide.highlight = req.body.highlight || slide.highlight;
+        slide.sub = req.body.sub || slide.sub;
+
+        const updatedSlide = await slide.save();
+        res.json(updatedSlide);
+    } else {
+        res.status(404).json({ message: "Slide not found" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -1,4 +1,5 @@
 import { Smartphone, UtensilsCrossed, Shirt, Sparkles, Home, Headphones } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const categories = [
   { name: "Electronics", icon: Smartphone, color: "145 63% 42%" },
@@ -24,9 +25,9 @@ const CategoriesSection = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map(({ name, icon: Icon, color }) => (
-            <a
+            <Link
               key={name}
-              href="#"
+              to={`/shop?category=${encodeURIComponent(name)}`}
               className="group bg-card rounded-xl p-6 text-center card-shadow hover:card-shadow-hover hover:-translate-y-1 transition-all duration-300"
             >
               <div
@@ -36,7 +37,7 @@ const CategoriesSection = () => {
                 <Icon className="h-7 w-7" style={{ color: `hsl(${color})` }} />
               </div>
               <span className="font-medium text-sm text-foreground">{name}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

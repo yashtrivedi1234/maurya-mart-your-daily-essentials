@@ -1,13 +1,16 @@
 import express from "express";
-import { authMiddleware, adminMiddleware } from "../middleware/auth.Middleware.js";
+import { authMiddleware } from "../middleware/auth.Middleware.js";
+import { getCart, addItemToCart, updateCartItem, removeItemFromCart, clearCart } from "../controllers/cart.Controller.js";
 
 const router = express.Router();
-// Protected Cart Route
-router.get("/", authMiddleware, async (req, res) => {
-  res.json({
-    message: "Protected Cart API Working",
-    userId: req.user.id,
-  });
-});
+
+// All cart routes are protected
+router.use(authMiddleware);
+
+router.get("/", getCart);
+router.post("/add", addItemToCart);
+router.put("/update", updateCartItem);
+router.delete("/remove/:productId", removeItemFromCart);
+router.post("/clear", clearCart);
 
 export default router;

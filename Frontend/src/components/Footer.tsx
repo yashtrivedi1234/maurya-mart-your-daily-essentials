@@ -1,6 +1,5 @@
-import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
-import mauryaLogo from "../image/mauryalogo.png";
+import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -9,12 +8,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center -mt-16 -mb-12">
-              <img 
-                src={mauryaLogo}
-                alt="Maurya Mart Logo" 
-                className="w-[200px] h-auto object-contain drop-shadow-sm -my-12"
-              />
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg hero-gradient flex items-center justify-center">
+                <span className="text-primary-foreground font-bold">M</span>
+              </div>
+              <span className="font-display font-bold text-lg">MaurMart</span>
             </div>
             <p className="text-primary-foreground/60 text-sm leading-relaxed">
               Your one-stop shop for daily essentials and electronics. Quality products at the best prices.
@@ -25,9 +23,15 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm text-primary-foreground/60">
-              {["Home", "Shop", "About Us", "Contact", "FAQ"].map((l) => (
-                <li key={l}>
-                  <a href="#" className="hover:text-primary-foreground transition-colors">{l}</a>
+              {[
+                { label: "Home", to: "/" },
+                { label: "Shop", to: "/shop" },
+                { label: "About Us", to: "/about" },
+                { label: "Contact", to: "/contact" },
+                { label: "FAQ", to: "/faq" },
+              ].map((l) => (
+                <li key={l.label}>
+                  <Link to={l.to} className="hover:text-primary-foreground transition-colors">{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -37,7 +41,7 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Contact Us</h4>
             <ul className="space-y-2 text-sm text-primary-foreground/60">
-              <li>📧 support@mauryamart.com</li>
+              <li>📧 support@maurmart.com</li>
               <li>📞 +91 98765 43210</li>
               <li>📍 India</li>
             </ul>
@@ -68,11 +72,11 @@ const Footer = () => {
 
         <div className="mt-12 pt-6 border-t border-primary-foreground/10 text-center">
           <p className="text-primary-foreground/40 text-sm">
-            © {new Date().getFullYear()} Maurya Mart. All rights reserved.
+            © {new Date().getFullYear()} Maur Mart. All rights reserved.
           </p>
           <p className="text-primary-foreground/50 text-sm mt-2 font-medium">
-            Created and Developed by{" "}
-            <span className="text-primary font-semibold">Yash Trivedi</span>
+            Digital Experience by{" "}
+            <span className="text-primary font-semibold">Yash & Shalu</span>
           </p>
         </div>
       </div>

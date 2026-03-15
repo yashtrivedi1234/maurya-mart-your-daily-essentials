@@ -1,172 +1,273 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLoginMutation } from "@/redux/api";
-import Navbar from "@/components/Navbar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+
+import { useLoginMutation, useRegisterMutation, useVerifyOtpMutation, useResendOtpMutation } from "@/store/api/authApi";
 
 const Login = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [login, { isLoading }] = useLoginMutation();
+  const [name, setName] = useState("");
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [login, { isLoading: isLoginLoading }] = useLoginMutation();
+  const [register, { isLoading: isRegisterLoading }] = useRegisterMutation();
+  const [verifyOtp, { isLoading: isVerifyLoading }] = useVerifyOtpMutation();
+  const [resendOtp, { isLoading: isResendLoading }] = useResendOtpMutation();
 
+  const handleResendOtp = async () => {
     try {
-      const res = await login({ email, password }).unwrap();
-      localStorage.setItem("token", res.token);
-      toast.success("Login Successful", {
-        description: "Welcome back to Maurya Mart!",
+      await resendOtp(email).unwrap();
+      toast({
+        title: "Code Resent",
+        description: "A new verification code has been sent to your email.",
       });
-      navigate("/");
     } catch (err: unknown) {
-      const error = err as any;
-      toast.error("Login Failed", {
-        description: error?.data?.message || "Invalid credentials. Please try again.",
+      const error = err as { data?: { message?: string } };
+      toast({
+        title: "Error",
+        description: error.data?.message || "Failed to resend code.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (isVerifying) {
+        const result = await verifyOtp({ email, otp }).unwrap();
+        localStorage.setItem("token", result.token);
+        toast({
+          title: "Login Successful",
+          description: "Welcome back to Maurya Mart!",
+        });
+        
+        // Redirect to admin dashboard if the logged in user is admin
+        if (email === "admin@gmail.com") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      } else if (isSignUp) {
+        const result = await register({ name, email, password }).unwrap();
+        toast({
+          title: "Account Created",
+          description: result.message || "Please sign in to verify your account.",
+        });
+        setIsSignUp(false);
+      } else {
+        const result = await login({ email, password }).unwrap();
+        if (result.needsVerification) {
+          toast({
+            title: "Verification Required",
+            description: "A 4-digit code has been sent to your email.",
+          });
+          setIsVerifying(true);
+        } else {
+          localStorage.setItem("token", result.token);
+          toast({
+            title: "Welcome Back!",
+            description: result.message || "You have signed in successfully.",
+          });
+          navigate("/");
+        }
+      }
+    } catch (err: unknown) {
+      const error = err as { data?: { message?: string } };
+      toast({
+        title: "Error",
+        description: error.data?.message || "Something went wrong. Please try again.",
+        variant: "destructive",
       });
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-sans">
-      <Navbar />
-      
-      <main className="flex-1 flex items-center justify-center relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
-        {/* Animated Background Elements matching CTASection */}
-        <motion.div 
-          className="absolute -top-32 -left-32 w-96 h-96 rounded-full mix-blend-screen filter blur-[80px]"
-          style={{ backgroundColor: "var(--primary-foreground)", opacity: 0.15 }}
-          animate={{ x: [0, 100, 0], y: [0, 50, -50, 0], scale: [1, 1.2, 1] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div 
-          className="absolute -bottom-32 -right-32 w-[30rem] h-[30rem] rounded-full mix-blend-screen filter blur-[100px]"
-          style={{ backgroundColor: "var(--primary-foreground)", opacity: 0.1 }}
-          animate={{ x: [0, -80, 0], y: [0, -60, 40, 0], scale: [1, 1.1, 0.9, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-        />
-
-        <motion.div
-           initial={{ opacity: 0, y: 20, scale: 0.95 }}
-           animate={{ opacity: 1, y: 0, scale: 1 }}
-           transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-           className="w-full max-w-md relative z-10"
-        >
-          <div className="glass-panel p-8 sm:p-10 rounded-2xl shadow-2xl relative overflow-hidden border border-white/10 dark:border-white/5 bg-white/70 dark:bg-black/40 backdrop-blur-xl">
-            {/* Top gradient accent line */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/40 via-primary to-primary/40" />
-
-            <div className="text-center mb-10">
-              <motion.h2 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.4 }}
-                className="text-3xl font-display font-bold text-foreground"
-              >
-                Welcome back
-              </motion.h2>
-              <motion.p 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-                className="mt-3 text-sm text-muted-foreground"
-              >
-                Enter your credentials to access your account
-              </motion.p>
+    <div className="min-h-screen bg-muted/30 flex">
+      <div className="hidden lg:flex lg:w-1/2 hero-gradient relative items-center justify-center p-12">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(160_50%_40%/0.3),transparent_60%)]" />
+        <div className="relative z-10 max-w-md">
+          <a href="/" className="flex items-center gap-2 mb-10">
+            <div className="w-10 h-10 rounded-lg bg-primary-foreground/15 flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-xl">M</span>
             </div>
+            <span className="font-display font-bold text-2xl text-primary-foreground">
+              Maur<span className="opacity-80">Mart</span>
+            </span>
+          </a>
+          <h1 className="text-4xl font-display font-bold text-primary-foreground leading-tight mb-4">
+            Your Daily Essentials, Delivered Fast
+          </h1>
+          <p className="text-primary-foreground/70 text-lg leading-relaxed">
+            Shop groceries, electronics, and everyday products at the best prices. Join thousands of happy customers.
+          </p>
+          <div className="mt-10 flex gap-6 text-primary-foreground/60 text-sm">
+            <span>✓ Free Delivery</span>
+            <span>✓ Secure Payments</span>
+            <span>✓ Easy Returns</span>
+          </div>
+        </div>
+      </div>
 
-            <form onSubmit={handleLogin} className="space-y-6">
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.4 }}
-                className="space-y-1"
-              >
-                <label className="text-sm font-medium text-foreground ml-1">Email</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-muted-foreground/70" />
+      <div className="flex-1 flex items-center justify-center p-6 md:p-12">
+        <div className="w-full max-w-md">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mb-8 text-muted-foreground"
+            onClick={() => navigate("/")}
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back to store
+          </Button>
+
+          <div className="mb-8">
+            <div className="lg:hidden flex items-center gap-2 mb-6">
+              <div className="w-9 h-9 rounded-lg hero-gradient flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-lg">M</span>
+              </div>
+              <span className="font-display font-bold text-xl text-foreground">
+                Maur<span className="text-primary">Mart</span>
+              </span>
+            </div>
+            <h2 className="text-2xl font-display font-bold text-foreground">
+              {isVerifying ? "Verify your email" : isSignUp ? "Create your account" : "Welcome back"}
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              {isVerifying
+                ? `Enter the 4-digit code sent to ${email}`
+                : isSignUp
+                ? "Sign up to start shopping"
+                : "Sign in to your MaurMart account"}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {isVerifying ? (
+              <div className="space-y-2">
+                <Label htmlFor="otp">Verification Code</Label>
+                <Input
+                  id="otp"
+                  placeholder="1234"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  required
+                  maxLength={4}
+                  className="h-11 text-center text-2xl tracking-[1em]"
+                />
+                <div className="flex justify-end mt-1">
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={isResendLoading}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {isResendLoading ? "Sending..." : "Resend code"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {isSignUp && (
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input
+                      id="name"
+                      placeholder="Yash Trivedi"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="h-11"
+                    />
                   </div>
-                  <input
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
                     type="email"
-                    required
-                    className="w-full pl-10 pr-4 py-3 bg-background/50 border border-input focus:border-primary/50 focus:ring-2 focus:ring-primary/20 rounded-xl outline-none transition-all placeholder:text-muted-foreground/50 text-foreground"
-                    placeholder="name@example.com"
+                    placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-              </motion.div>
-
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4, duration: 0.4 }}
-                className="space-y-1"
-              >
-                <div className="flex items-center justify-between ml-1">
-                  <label className="text-sm font-medium text-foreground">Password</label>
-                  <a href="#" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
-                    Forgot password?
-                  </a>
-                </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-muted-foreground/70" />
-                  </div>
-                  <input
-                    type="password"
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-background/50 border border-input focus:border-primary/50 focus:ring-2 focus:ring-primary/20 rounded-xl outline-none transition-all placeholder:text-muted-foreground/50 text-foreground"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-11"
                   />
                 </div>
-              </motion.div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="h-11 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.4 }}
+            {!isSignUp && !isVerifying && (
+              <div className="flex justify-end">
+                <button type="button" className="text-sm text-primary hover:underline">
+                  Forgot password?
+                </button>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full h-11 rounded-lg text-base" disabled={isLoginLoading || isRegisterLoading || isVerifyLoading}>
+              {isLoginLoading || isRegisterLoading || isVerifyLoading
+                ? "Please wait..."
+                : isVerifying
+                ? "Verify OTP"
+                : isSignUp
+                ? "Create Account"
+                : "Sign In"}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm text-muted-foreground">
+            {isVerifying ? (
+              <button
+                onClick={() => setIsVerifying(false)}
+                className="text-primary font-medium hover:underline"
               >
-                <Button 
-                  type="submit" 
-                  disabled={isLoading}
-                  className="w-full py-6 rounded-xl font-bold flex items-center justify-center gap-2 group transition-all"
+                Back to sign up
+              </button>
+            ) : (
+              <>
+                {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+                <button
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="text-primary font-medium hover:underline"
                 >
-                  {isLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <>
-                      Sign In 
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </>
-                  )}
-                </Button>
-              </motion.div>
-            </form>
-
-            <motion.div 
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               transition={{ delay: 0.6, duration: 0.4 }}
-               className="mt-8 pt-6 border-t border-border/50 text-center"
-            >
-              <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
-                <Link to="/register" className="font-bold text-primary hover:text-primary/80 transition-colors">
-                  Sign up now
-                </Link>
-              </p>
-            </motion.div>
+                  {isSignUp ? "Sign in" : "Sign up"}
+                </button>
+              </>
+            )}
           </div>
-        </motion.div>
-      </main>
+        </div>
+      </div>
     </div>
   );
 };
