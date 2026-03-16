@@ -44,6 +44,57 @@ const SPECS = [
   { label: "Material", value: "Premium Stainless Steel" },
 ];
 
+const REVIEWS = [
+  {
+    id: 1,
+    name: "Rajesh Kumar",
+    rating: 5,
+    title: "Excellent product, highly recommended!",
+    body: "Great quality and fast delivery. The product exceeded my expectations. Definitely worth the price.",
+    verified: true,
+    date: "2 weeks ago",
+    helpful: 42,
+    notHelpful: 2,
+  },
+  {
+    id: 2,
+    name: "Priya Singh",
+    rating: 4,
+    title: "Good value for money",
+    body: "Really happy with my purchase. Minor issue with packaging but the product itself is excellent.",
+    verified: true,
+    date: "1 month ago",
+    helpful: 28,
+    notHelpful: 1,
+  },
+  {
+    id: 3,
+    name: "Amit Patel",
+    rating: 5,
+    title: "Perfect! Exactly as described",
+    body: "This product is perfect. The quality is exceptional and it arrived on time.",
+    verified: true,
+    date: "1 month ago",
+    helpful: 35,
+    notHelpful: 0,
+  },
+];
+
+const QA = [
+  {
+    q: "Is this product available in different colors?",
+    a: "Yes, this product is available in multiple colors. Please check the color options in the product selector above.",
+  },
+  {
+    q: "What is the warranty period?",
+    a: "This product comes with a 1-year manufacturer warranty covering all manufacturing defects.",
+  },
+  {
+    q: "Do you provide free shipping?",
+    a: "Yes, we provide free shipping on all orders above ₹500. For orders below that, shipping charges will apply.",
+  },
+];
+
 /* ─── Sub-components ─── */
 
 const StarRow = ({ rating, size = "h-4 w-4" }: { rating: number; size?: string }) =>
@@ -464,13 +515,16 @@ const ProductDetails = () => {
                 <span className="text-xs text-muted-foreground mt-1">{totalReviews.toLocaleString()} ratings</span>
               </div>
               <div className="flex-1 space-y-1.5 w-full">
-                {REVIEW_BREAKDOWN.map(({ stars, count, pct }) => (
-                  <div key={stars} className="flex items-center gap-3 text-sm">
-                    <span className="text-muted-foreground w-12 text-right shrink-0">{stars} star</span>
-                    <Progress value={pct} className="flex-1 h-2.5" />
-                    <span className="text-muted-foreground w-10 text-right shrink-0">{pct}%</span>
-                  </div>
-                ))}
+                {REVIEW_BREAKDOWN.map(({ stars, count }) => {
+                  const pct = Math.round((count / totalReviews) * 100);
+                  return (
+                    <div key={stars} className="flex items-center gap-3 text-sm">
+                      <span className="text-muted-foreground w-12 text-right shrink-0">{stars} star</span>
+                      <Progress value={pct} className="flex-1 h-2.5" />
+                      <span className="text-muted-foreground w-10 text-right shrink-0">{pct}%</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
