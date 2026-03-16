@@ -34,6 +34,8 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { data: cart, isLoading } = useGetCartQuery({});
   const [createOrder, { isLoading: isPlacingOrder }] = useCreateOrderMutation();
+  const [createRazorpayOrder, { isLoading: isCreatingRPOrder }] = useCreateRazorpayOrderMutation();
+  const [verifyPayment, { isLoading: isVerifyingPayment }] = useVerifyPaymentMutation();
 
   const [shippingAddress, setShippingAddress] = useState({
     name: "",
@@ -62,14 +64,27 @@ const Checkout = () => {
     }
 
     try {
+      // Check if Razorpay is loaded
+      if (!window.Razorpay) {
+        toast.error("Razorpay is not loaded. Please refresh the page.");
+        return;
+      }
+
+      toast.loading("Initiating payment...");
+
       // 1. Create Razorpay Order on Backend
       // The user requested ₹1 for testing
       const testAmount = 1; 
       const razorpayOrder = await createRazorpayOrder(testAmount).unwrap();
 
+      if (!razorpayOrder || !razorpayOrder.id) {
+        toast.error("Failed to create payment order");
+        return;
+      }
+
       // 2. Open Razorpay Checkout
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_SPWxzAB35uUahp",
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         name: "MaurMart",
@@ -108,9 +123,12 @@ const Checkout = () => {
               setTimeout(() => {
                 navigate("/");
               }, 3000);
+            } else {
+              toast.error("Payment verification failed");
             }
           } catch (err: unknown) {
             const error = err as { data?: { message?: string } };
+            console.error("Payment verification error:", err);
             toast.error(error.data?.message || "Payment verification failed");
           }
         },
@@ -128,12 +146,10 @@ const Checkout = () => {
 
     } catch (err: unknown) {
       const error = err as { data?: { message?: string } };
+      console.error("Payment error:", err);
       toast.error(error.data?.message || "Error initializing payment");
     }
   };
-
-  const [createRazorpayOrder, { isLoading: isCreatingRPOrder }] = useCreateRazorpayOrderMutation();
-  const [verifyPayment, { isLoading: isVerifyingPayment }] = useVerifyPaymentMutation();
 
   if (isLoading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
   if (!cart?.items?.length && !isSuccess) {

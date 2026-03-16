@@ -28,7 +28,8 @@ const Wishlist = () => {
         return;
       }
       await addToCart({ productId: product.id, quantity: 1 }).unwrap();
-      toast.success(`${product.name} added to cart!`);
+      const productName = product?.name || "Product";
+      toast.success(`✓ ${productName} added to cart!`);
     } catch (error) {
       toast.error("Failed to add to cart");
     }
