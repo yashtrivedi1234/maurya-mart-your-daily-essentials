@@ -328,6 +328,8 @@ npm run preview  # Preview production build locally
 
 ## 🌐 Deployment
 
+You can deploy this project to either **Render** or **Vercel**. Choose your preferred platform below.
+
 ### Deploy to Render
 
 #### Step 1: Deploy Backend (Web Service)
@@ -364,7 +366,7 @@ npm run preview  # Preview production build locally
    ```
 5. Click **Create Static Site**
 
-#### Step 3: Verification
+#### Step 3: Verification (Render)
 
 After deployment, verify everything works:
 
@@ -373,6 +375,62 @@ After deployment, verify everything works:
 - ✅ Login works end-to-end
 - ✅ Products load from backend
 - ✅ Payment flow completes
+
+---
+
+### Deploy to Vercel
+
+#### Step 1: Deploy Backend
+
+Your backend can be deployed to Render, Railway, AWS, or any Node.js hosting platform. Follow the Render backend steps above for best results.
+
+#### Step 2: Deploy Frontend to Vercel
+
+1. Push your code to GitHub
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+3. Click **Add New** → **Project**
+4. Import your GitHub repository
+5. Configure:
+   - **Framework Preset**: Vite
+   - **Root Directory**: `Frontend`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+6. Add Environment Variables:
+   ```
+   VITE_API_BASE_URL=https://your-backend-url
+   VITE_RAZORPAY_KEY_ID=your_razorpay_key
+   ```
+7. Click **Deploy**
+
+#### ⚠️ Step 3: Important - Fix Routing Issue on Refresh
+
+**Problem**: On Vercel, refreshing the page on non-root routes (e.g., `/shop`, `/product/123`) shows a 404 error because these routes only exist on the client-side.
+
+**Solution**: A `vercel.json` file is already included in the `Frontend` directory:
+
+**Frontend/vercel.json** (already created):
+```json
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+This tells Vercel to rewrite all requests to `index.html`, allowing **React Router to handle client-side routing**. Without this configuration, refreshing on non-root routes will fail.
+
+#### Step 4: Verification (Vercel)
+
+After deployment:
+
+- ✅ Frontend loads: `https://your-project.vercel.app`
+- ✅ **Refresh works on all routes** (e.g., `/shop`, `/product/123`, `/checkout`)
+- ✅ Navigation between pages works smoothly
+- ✅ API calls reach your backend
+- ✅ Payment flow completes successfully
 
 ---
 
@@ -411,11 +469,32 @@ After deployment, verify everything works:
 - Check internet connection
 - Ensure image URLs are accessible
 
+### Vercel Deployment Issues
+
+**"404 on page refresh / Routes break on refresh"**
+- ⚠️ **Most Common Issue**: The `vercel.json` file is missing or not in the `Frontend` directory
+- **Fix**: Ensure `Frontend/vercel.json` exists with the rewrites configuration (see Deployment section)
+- **If still not working**:
+  1. Delete the Vercel project and redeploy
+  2. Verify `vercel.json` is in the root of Frontend directory
+  3. Check deployment logs for errors
+  4. Clear browser cache and hard refresh (Ctrl+Shift+R or Cmd+Shift+R)
+
+**"Cannot find module or build fails"**
+- Ensure `Root Directory` is set to `Frontend` in Vercel settings
+- Clear Vercel build cache: go to project settings → under "Git" click "Clear cache"
+- Redeploy
+
+**"API calls return 404 from frontend"**
+- Verify backend URL in `VITE_API_BASE_URL` environment variable
+- Ensure backend is deployed and running
+- Check backend `CORS_ORIGINS` includes your Vercel frontend URL
+
 ---
 
 ## 🤝 Contributing
 
-This is a private project for Maur Mart. For contributions or issues:
+This is a private project for Maurya Mart. For contributions or issues:
 
 1. Create a feature branch: `git checkout -b feature/your-feature`
 2. Commit changes: `git commit -m 'Add your feature'`
