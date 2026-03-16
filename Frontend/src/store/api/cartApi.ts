@@ -6,7 +6,9 @@ export const cartApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${API_BASE_URL}/api/cart`,
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem("token");
+      const userToken = localStorage.getItem("token");
+      const adminToken = localStorage.getItem("adminToken");
+      const token = adminToken || userToken;
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }

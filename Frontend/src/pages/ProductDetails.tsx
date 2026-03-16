@@ -173,8 +173,11 @@ const ProductDetails = () => {
       await addToCart({ productId: product._id, quantity }).unwrap();
       const productName = product?.name || "Product";
       toast.success(`✓ ${quantity > 1 ? `${quantity}x ` : ""}${productName} added to cart!`);
-    } catch (err) {
-      toast.error("Failed to add to cart");
+    } catch (err: unknown) {
+      const error = err as { data?: { message?: string } };
+      const errorMessage = error?.data?.message || "Failed to add to cart";
+      console.error("Add to cart error:", err);
+      toast.error(errorMessage);
     }
   };
 

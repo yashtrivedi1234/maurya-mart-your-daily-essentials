@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useGetCartQuery } from "@/store/api/cartApi";
@@ -47,6 +47,16 @@ const Checkout = () => {
 
   const [paymentMethod, setPaymentMethod] = useState("Online Payment");
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // Auto-redirect after successful payment
+  useEffect(() => {
+    if (isSuccess) {
+      const timer = setTimeout(() => {
+        navigate("/");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccess, navigate]);
 
   const calculateTotal = () => {
     if (!cart?.items) return 0;
@@ -117,18 +127,17 @@ const Checkout = () => {
               };
 
               await createOrder(orderData).unwrap();
+              toast.dismiss(); // Dismiss loading toast
               setIsSuccess(true);
               toast.success("Payment successful and order placed!");
-              
-              setTimeout(() => {
-                navigate("/");
-              }, 3000);
             } else {
+              toast.dismiss(); // Dismiss loading toast
               toast.error("Payment verification failed");
             }
           } catch (err: unknown) {
             const error = err as { data?: { message?: string } };
             console.error("Payment verification error:", err);
+            toast.dismiss(); // Dismiss loading toast
             toast.error(error.data?.message || "Payment verification failed");
           }
         },
@@ -139,6 +148,11 @@ const Checkout = () => {
         theme: {
           color: "#10b981",
         },
+        modal: {
+          ondismiss: () => {
+            toast.dismiss(); // Dismiss loading toast if user closes payment modal
+          }
+        }
       };
 
       const rzp = new window.Razorpay(options);
