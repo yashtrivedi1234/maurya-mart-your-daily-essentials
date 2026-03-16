@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_BASE_URL } from "@/lib/apiBase";
 
 export interface Product {
   _id: string;
@@ -21,7 +22,7 @@ export interface Product {
 export const productApi = createApi({
   reducerPath: "productApi",
   baseQuery: fetchBaseQuery({ 
-    baseUrl: "http://localhost:5001/api/products",
+    baseUrl: `${API_BASE_URL}/api/products`,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       if (token) {

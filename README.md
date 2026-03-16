@@ -49,7 +49,36 @@ Maurya Mart is a modern E-commerce platform designed to provide a seamless shopp
 ### Frontend Setup
 1. Navigate to `Frontend` directory.
 2. Install dependencies: `npm install`.
+3. Create `.env` from `.env.example` and set `VITE_API_BASE_URL`.
 3. Start development server: `npm run dev`.
+
+## Render Deployment
+
+### 1. Deploy Backend (Web Service)
+1. In Render dashboard, click **New +** > **Web Service**.
+2. Connect your GitHub repo and select the backend root directory: `Bankend`.
+3. Use these settings:
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+4. Add backend environment variables from `Bankend/.env.example`.
+5. Set `CORS_ORIGINS` to include your frontend Render URL, for example:
+   - `https://maurya-mart-frontend.onrender.com`
+
+### 2. Deploy Frontend (Static Site)
+1. In Render dashboard, click **New +** > **Static Site**.
+2. Connect the same repo and select root directory: `Frontend`.
+3. Use these settings:
+   - Build Command: `npm install ; npm run build`
+   - Publish Directory: `dist`
+4. Add frontend environment variables:
+   - `VITE_API_BASE_URL=https://your-backend-service.onrender.com`
+   - `VITE_RAZORPAY_KEY_ID=your_razorpay_key`
+
+### 3. Final Checklist
+- Backend service is healthy on `/api` routes.
+- Frontend env `VITE_API_BASE_URL` points to backend Render URL.
+- Backend `CORS_ORIGINS` includes frontend Render URL.
+- Cloudinary, MongoDB, Email, and Razorpay keys are set in backend env.
 
 ## 📄 License
 This project is private and intended for Maurya Mart operations.
