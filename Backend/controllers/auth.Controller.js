@@ -116,10 +116,10 @@ export const loginUser = async (req, res) => {
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,
-        subject: "Login Verification Code - Maurya Mart",
+        subject: "Login Verification Code - MaurMart",
         html: `
           <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-            <h2 style="color: #10b981;">Maurya Mart Login</h2>
+            <h2 style="color: #10b981;">MaurMart Login</h2>
             <p>Please use the following code to complete your login:</p>
             <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #111827; margin: 20px 0;">${otp}</div>
             <p style="color: #6b7280; font-size: 14px;">This code will expire in 10 minutes.</p>
@@ -157,10 +157,10 @@ export const resendOtp = async (req, res) => {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Your New Verification Code - Maurya Mart",
+      subject: "Your New Verification Code - MaurMart",
       html: `
         <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-          <h2 style="color: #10b981;">Maurya Mart</h2>
+          <h2 style="color: #10b981;">MaurMart</h2>
           <p>Your new verification code is:</p>
           <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #111827; margin: 20px 0;">${otp}</div>
           <p style="color: #6b7280; font-size: 14px;">This code will expire in 10 minutes.</p>
@@ -279,7 +279,7 @@ export const forgotPassword = async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Password Reset Code - Maurya Mart",
+      subject: "Password Reset Code - MaurMart",
       html: `
         <h2>Password Reset Request</h2>
         <p>Your password reset code is: <strong>${resetCode}</strong></p>

@@ -31,7 +31,7 @@ const sendOrderEmails = async (order, userEmail) => {
 
   const emailTemplate = (title, recipientName) => `
     <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-      <h2 style="color: #10b981; text-align: center;">Maurya Mart</h2>
+      <h2 style="color: #10b981; text-align: center;">MaurMart</h2>
       <h3 style="color: #111827;">${title}</h3>
       <p>Hello ${recipientName},</p>
       <p>Order ID: <strong>${order._id}</strong></p>
@@ -57,7 +57,7 @@ const sendOrderEmails = async (order, userEmail) => {
         ${order.shippingAddress.address}, ${order.shippingAddress.city} - ${order.shippingAddress.pincode}</p>
       </div>
       <p style="color: #6b7280; font-size: 14px; margin-top: 30px; text-align: center;">
-        Thank you for shopping with Maurya Mart!
+        Thank you for shopping with MaurMart!
       </p>
     </div>
   `;
@@ -67,7 +67,7 @@ const sendOrderEmails = async (order, userEmail) => {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: userEmail,
-      subject: `Order Receipt - Maurya Mart #${order._id.toString().substring(0, 8)}`,
+      subject: `Order Receipt - MaurMart #${order._id.toString().substring(0, 8)}`,
       html: emailTemplate("Your Order Receipt", order.shippingAddress.name),
     });
 
@@ -75,7 +75,7 @@ const sendOrderEmails = async (order, userEmail) => {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: adminEmail,
-      subject: `New Order Received - Maurya Mart #${order._id.toString().substring(0, 8)}`,
+      subject: `New Order Received - MaurMart #${order._id.toString().substring(0, 8)}`,
       html: emailTemplate("New Order Details", "Admin"),
     });
 

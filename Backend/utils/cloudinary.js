@@ -2,7 +2,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { Readable } from "stream";
 
 // Configuration will be handled via .env
-export const uploadToCloudinary = async (fileBuffer, folder = "maurya-mart") => {
+export const uploadToCloudinary = async (fileBuffer, folder = "maurmart") => {
   try {
     if (!fileBuffer) return null;
 
