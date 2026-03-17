@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Package, 
+  Flame,
   ShoppingBag, 
   Users, 
   Settings, 
@@ -27,6 +28,7 @@ const AdminLayout = () => {
   const menuItems = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
     { name: "Products", path: "/admin/products", icon: Package },
+    { name: "Trending", path: "/admin/trending", icon: Flame },
     { name: "Orders", path: "/admin/orders", icon: ShoppingBag },
     { name: "Hero Section", path: "/admin/hero", icon: Settings },
     { name: "Brands", path: "/admin/brands", icon: Image },

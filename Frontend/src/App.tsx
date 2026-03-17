@@ -26,9 +26,11 @@ import AdminBrands from "./pages/admin/AdminBrands";
 import AdminNewsletter from "./pages/admin/AdminNewsletter";
 import AdminContact from "./pages/admin/AdminContact";
 import AdminFAQ from "./pages/admin/AdminFAQ";
+import AdminTrending from "./pages/admin/AdminTrending";
 import AdminLayout from "./components/admin/AdminLayout";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import ProductDetails from "./pages/ProductDetails";
+import Trending from "./pages/Trending";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +47,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/shop/:id" element={<ProductDetails />} />
+            <Route path="/trending" element={<Trending />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/cart" element={<Cart />} />
@@ -63,6 +66,7 @@ const App = () => (
           <Route element={<ProtectedAdminRoute><AdminLayout /></ProtectedAdminRoute>}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/admin/trending" element={<AdminTrending />} />
             <Route path="/admin/orders" element={<AdminOrders />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/hero" element={<AdminHero />} />

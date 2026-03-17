@@ -36,10 +36,10 @@ const upload = multer({
 
 // Public routes
 router.get("/", getProducts);
-router.get("/:id", getProductById);
+router.get("/trending", getTrendingProducts);
 router.get("/featured", getFeaturedProducts);
 router.get("/new-arrivals", getNewArrivals);
-router.get("/trending", getTrendingProducts);
+router.get("/:id", getProductById);
 
 // Admin routes
 router.post("/", authMiddleware, adminMiddleware, upload.single("image"), createProduct);

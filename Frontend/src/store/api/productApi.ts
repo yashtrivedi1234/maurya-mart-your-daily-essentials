@@ -66,6 +66,18 @@ export const productApi = createApi({
       }),
       invalidatesTags: ["Product"],
     }),
+    getTrendingProducts: builder.query({
+      query: () => "/trending",
+      providesTags: ["Product"],
+    }),
+    updateProductStatus: builder.mutation({
+      query: ({ id, statusData }) => ({
+        url: `/admin/${id}/status`,
+        method: "PATCH",
+        body: statusData,
+      }),
+      invalidatesTags: ["Product"],
+    }),
   }),
 });
 
@@ -74,5 +86,7 @@ export const {
   useGetProductByIdQuery,
   useCreateProductMutation,
   useUpdateProductMutation,
-  useDeleteProductMutation
+  useDeleteProductMutation,
+  useGetTrendingProductsQuery,
+  useUpdateProductStatusMutation
 } = productApi;

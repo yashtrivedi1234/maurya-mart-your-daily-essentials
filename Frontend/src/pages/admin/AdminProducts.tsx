@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Product {
   _id: string;
@@ -40,6 +41,9 @@ interface Product {
   stock: number;
   image: string;
   description: string;
+  isFeatured?: boolean;
+  isNewArrival?: boolean;
+  isTrending?: boolean;
 }
 
 const AdminProducts = () => {
@@ -210,6 +214,32 @@ const AdminProducts = () => {
                   </div>
                 </div>
               </div>
+              <div className="grid grid-cols-3 gap-4 col-span-2">
+                <div className="flex items-center gap-2 rounded-lg p-3 border border-border/50 hover:bg-muted/30 transition-colors">
+                  <Checkbox 
+                    id="isFeatured" 
+                    checked={currentProduct.isFeatured || false}
+                    onCheckedChange={(checked) => setCurrentProduct({...currentProduct, isFeatured: checked})}
+                  />
+                  <Label htmlFor="isFeatured" className="text-sm font-medium cursor-pointer">Featured</Label>
+                </div>
+                <div className="flex items-center gap-2 rounded-lg p-3 border border-border/50 hover:bg-muted/30 transition-colors">
+                  <Checkbox 
+                    id="isNewArrival" 
+                    checked={currentProduct.isNewArrival || false}
+                    onCheckedChange={(checked) => setCurrentProduct({...currentProduct, isNewArrival: checked})}
+                  />
+                  <Label htmlFor="isNewArrival" className="text-sm font-medium cursor-pointer">New Arrival</Label>
+                </div>
+                <div className="flex items-center gap-2 rounded-lg p-3 border border-destructive/20 hover:bg-destructive/5 transition-colors">
+                  <Checkbox 
+                    id="isTrending" 
+                    checked={currentProduct.isTrending || false}
+                    onCheckedChange={(checked) => setCurrentProduct({...currentProduct, isTrending: checked})}
+                  />
+                  <Label htmlFor="isTrending" className="text-sm font-medium cursor-pointer text-destructive">🔥 Trending</Label>
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea id="description" rows={4} value={currentProduct.description || ""} onChange={(e) => setCurrentProduct({...currentProduct, description: e.target.value})} />
@@ -361,11 +391,37 @@ const AdminProducts = () => {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-description">Description</Label>
-              <Textarea id="edit-description" rows={4} value={currentProduct.description || ""} onChange={(e) => setCurrentProduct({...currentProduct, description: e.target.value})} />
-            </div>
+              <div className="grid grid-cols-3 gap-4 col-span-2">
+                <div className="flex items-center gap-2 rounded-lg p-3 border border-border/50 hover:bg-muted/30 transition-colors">
+                  <Checkbox 
+                    id="edit-isFeatured" 
+                    checked={currentProduct.isFeatured || false}
+                    onCheckedChange={(checked) => setCurrentProduct({...currentProduct, isFeatured: checked})}
+                  />
+                  <Label htmlFor="edit-isFeatured" className="text-sm font-medium cursor-pointer">Featured</Label>
+                </div>
+                <div className="flex items-center gap-2 rounded-lg p-3 border border-border/50 hover:bg-muted/30 transition-colors">
+                  <Checkbox 
+                    id="edit-isNewArrival" 
+                    checked={currentProduct.isNewArrival || false}
+                    onCheckedChange={(checked) => setCurrentProduct({...currentProduct, isNewArrival: checked})}
+                  />
+                  <Label htmlFor="edit-isNewArrival" className="text-sm font-medium cursor-pointer">New Arrival</Label>
+                </div>
+                <div className="flex items-center gap-2 rounded-lg p-3 border border-destructive/20 hover:bg-destructive/5 transition-colors">
+                  <Checkbox 
+                    id="edit-isTrending" 
+                    checked={currentProduct.isTrending || false}
+                    onCheckedChange={(checked) => setCurrentProduct({...currentProduct, isTrending: checked})}
+                  />
+                  <Label htmlFor="edit-isTrending" className="text-sm font-medium cursor-pointer text-destructive">🔥 Trending</Label>
+                </div>
+              </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea id="edit-description" rows={4} value={currentProduct.description || ""} onChange={(e) => setCurrentProduct({...currentProduct, description: e.target.value})} />
+              </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
               <Button type="submit">Update Product</Button>

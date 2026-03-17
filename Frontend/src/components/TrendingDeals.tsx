@@ -8,8 +8,8 @@ import { Link } from "react-router-dom";
 const TrendingDeals = () => {
   const { data: products, isLoading } = useGetProductsQuery({});
 
-  // Just using some products for trending deals mock behavior
-  const deals = products?.slice(4, 8) || [];
+  // Filter products marked as trending
+  const deals = products?.filter((product: Product) => product.isTrending).slice(0, 4) || [];
 
   return (
     <section className="py-16 bg-muted/30">
@@ -42,7 +42,7 @@ const TrendingDeals = () => {
 
         <div className="text-center mt-12">
           <Button variant="outline" className="rounded-full px-10 h-14 font-bold border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-lg" asChild>
-            <Link to="/shop">Explore All Deals</Link>
+            <Link to="/trending">Explore All Trending Deals</Link>
           </Button>
         </div>
       </div>
