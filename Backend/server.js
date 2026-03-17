@@ -100,36 +100,69 @@ app.use(express.json());
 // Serve static files from uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Verify MongoDB URI is set
+if (!process.env.MONGO_URI) {
+  console.error("❌ CRITICAL: MONGO_URI is not set in .env file!");
+  process.exit(1);
+}
+
+// Connect to MongoDB with proper timeout and retry settings
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected ✅"))
-  .catch((err) => console.log("MongoDB Error ❌", err.message));
+  .connect(process.env.MONGO_URI, {
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 10000,
+    retryWrites: true,
+    connectTimeoutMS: 10000,
+  })
+  .then(() => {
+    console.log("MongoDB Connected ✅");
+    // Only start the server after DB connection is established
+    startServer();
+  })
+  .catch((err) => {
+    console.error("MongoDB Connection Error ❌", err.message);
+    console.error("Make sure MongoDB is running and MONGO_URI is correct");
+    process.exit(1);
+  });
 
 // Verify email configuration
 verifyEmailConfig();
 
-app.use("/api/auth", authRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/newsletter", newsletterRoutes);
-app.use("/api/heroes", heroRoutes);
-app.use("/api/cart", cartRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/payment", paymentRoutes);
-app.use("/api/brands", brandRoutes);
-app.use("/api/contacts", contactRoutes);
-app.use("/api/faqs", faqRoutes);
-app.use("/api/chat", chatRoutes);
+// Setup routes
+const setupRoutes = () => {
+  app.use("/api/auth", authRoutes);
+  app.use("/api/admin", adminRoutes);
+  app.use("/api/products", productRoutes);
+  app.use("/api/newsletter", newsletterRoutes);
+  app.use("/api/heroes", heroRoutes);
+  app.use("/api/cart", cartRoutes);
+  app.use("/api/orders", orderRoutes);
+  app.use("/api/payment", paymentRoutes);
+  app.use("/api/brands", brandRoutes);
+  app.use("/api/contacts", contactRoutes);
+  app.use("/api/faqs", faqRoutes);
+  app.use("/api/chat", chatRoutes);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error("Global Error Handler:", err);
-  res.status(err.status || 500).json({
-    message: err.message || "Internal Server Error",
-    error: err
+  // Error handling middleware
+  app.use((err, req, res, next) => {
+    console.error("Global Error Handler:", err);
+    res.status(err.status || 500).json({
+      message: err.message || "Internal Server Error",
+      error: err
+    });
   });
-});
+};
 
-app.listen(process.env.PORT || 5001, () => {
-  console.log(`Server running on port ${process.env.PORT || 5001} 🚀`);
+const startServer = () => {
+  setupRoutes();
+  app.listen(process.env.PORT || 5001, () => {
+    console.log(`Server running on port ${process.env.PORT || 5001} 🚀`);
+  });
+};
+
+// Handle graceful shutdown
+process.on("SIGINT", () => {
+  mongoose.connection.close();
+  console.log("Server gracefully terminated");
+  process.exit(0);
 });
