@@ -45,16 +45,20 @@ const sendEmailAsync = (mailOptions) => {
     
     if (!transporter) {
       console.error("❌ Transporter not initialized. Missing email credentials in .env");
+      console.error("   EMAIL_USER:", process.env.EMAIL_USER ? "SET" : "NOT SET");
+      console.error("   EMAIL_PASS:", process.env.EMAIL_PASS ? "SET" : "NOT SET");
       return;
     }
     
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error("❌ Email Sending Error:", {
+        console.error("❌ EMAIL FAILED - Check Render environment variables:", {
           message: error.message,
           code: error.code,
           to: mailOptions.to,
-          timestamp: new Date().toISOString()
+          from: mailOptions.from,
+          timestamp: new Date().toISOString(),
+          suggestion: "Verify EMAIL_USER and EMAIL_PASS on Render dashboard"
         });
       } else {
         console.log("✅ Email sent successfully to", mailOptions.to, "- Response:", info.response);
