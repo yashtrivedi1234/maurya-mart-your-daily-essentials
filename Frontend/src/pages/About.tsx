@@ -28,14 +28,7 @@ const About = () => {
       <section className="hero-gradient py-20 md:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,hsl(160_50%_40%/0.3),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-2xl border border-white/30">
-              <span className="text-white font-bold text-3xl">M</span>
-            </div>
-            <span className="font-display font-bold text-4xl tracking-tight text-white">
-              Maur<span className="text-primary-foreground">Mart</span>
-            </span>
-          </div>
+        
           <h1 className="text-4xl md:text-5xl font-display font-bold text-primary-foreground mb-4">
             About MaurMart
           </h1>
