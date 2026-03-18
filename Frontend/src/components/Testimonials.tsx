@@ -105,21 +105,6 @@ const Testimonials = () => {
             }}
           />
         </div>
-
-        {/* ── Leave a review CTA ── */}
-        <p className="text-center text-muted-foreground text-xs mt-6">
-          Shopped with us?{" "}
-          <a
-            href="https://g.page/r/review"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-70"
-            style={{ color: "hsl(var(--primary))" }}
-          >
-            Leave us a review on Google →
-          </a>
-        </p>
-
       </div>
     </section>
   );
