@@ -3,21 +3,26 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import path from "path";
+import os from "os";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
 import nodemailer from "nodemailer";
 
+/* =======================
+   🔧 Configurations
+======================= */
+
+// Cloudinary Config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Verify Email Configuration on Startup
+// Email Verification
 const verifyEmailConfig = () => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("❌ CRITICAL: Email credentials missing in .env file!");
-    console.error("   Required: EMAIL_USER, EMAIL_PASS");
+    console.error("❌ Email credentials missing!");
     return false;
   }
 
@@ -29,20 +34,20 @@ const verifyEmailConfig = () => {
     },
   });
 
-  // Test the transporter
-  transporter.verify((error, success) => {
+  transporter.verify((error) => {
     if (error) {
-      console.error("❌ Email Configuration Error:", error.message);
-      console.error("   Email:", process.env.EMAIL_USER);
-      console.error("   Issue: Check if the app password is correct and Gmail account allows less secure apps");
+      console.error("❌ Email Error:", error.message);
     } else {
-      console.log("✅ Email Configuration Valid - Ready to send emails");
-      console.log("   Email:", process.env.EMAIL_USER);
+      console.log("✅ Email ready");
     }
   });
 
   return true;
 };
+
+/* =======================
+   📦 Imports (Routes)
+======================= */
 
 import authRoutes from "./routes/auth.Routes.js";
 import productRoutes from "./routes/product.Routes.js";
@@ -57,122 +62,178 @@ import faqRoutes from "./routes/faq.Routes.js";
 import adminRoutes from "./routes/admin.Routes.js";
 import chatRoutes from "./routes/chat.Routes.js";
 
+/* =======================
+   📁 Path Setup
+======================= */
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/* =======================
+   🚀 App Init
+======================= */
+
 const app = express();
+const PORT = process.env.PORT || 5000;
+const serverStartTime = new Date();
+
+/* =======================
+   🌐 CORS Setup
+======================= */
 
 const defaultOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "http://localhost:8080",
   "https://maurmart.vercel.app",
-  "https://maurmart.onrender.com"
+  "https://maurmart.onrender.com",
 ];
 
 const envOrigins = (process.env.CORS_ORIGINS || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map((o) => o.trim())
   .filter(Boolean);
 
 const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests from tools like Postman and same-origin server-to-server calls.
-    if (!origin) {
-      callback(null, true);
-      return;
-    }
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  })
+);
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-      return;
-    }
-
-    callback(new Error("Not allowed by CORS"));
-  },
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  credentials: true
-}));
+/* =======================
+   🧩 Middlewares
+======================= */
 
 app.use(express.json());
-
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    uptime: process.uptime(),
-    timestamp: new Date(),
-  });
-});
-
-
-// Serve static files from uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Verify MongoDB URI is set
-if (!process.env.MONGO_URI) {
-  console.error("❌ CRITICAL: MONGO_URI is not set in .env file!");
-  process.exit(1);
-}
+/* =======================
+   ❤️ Health Check API
+======================= */
 
-// Connect to MongoDB with proper timeout and retry settings
+app.get("/health", (req, res) => {
+  const uptimeSeconds = process.uptime();
+
+  const formatUptime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${hrs}h ${mins}m ${secs}s`;
+  };
+
+  const dbState = mongoose.connection.readyState;
+  const dbStatusMap = {
+    0: "disconnected",
+    1: "connected",
+    2: "connecting",
+    3: "disconnecting",
+  };
+
+  const emailConfigured =
+    process.env.EMAIL_USER && process.env.EMAIL_PASS ? true : false;
+
+  res.status(200).json({
+    status: "OK",
+
+    time: {
+      iso: new Date().toISOString(),
+      local: new Date().toLocaleString(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      serverStartTime: serverStartTime.toISOString(),
+    },
+
+    uptime: {
+      seconds: uptimeSeconds,
+      human: formatUptime(uptimeSeconds),
+    },
+
+    request: {
+      method: req.method,
+      url: req.originalUrl,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    },
+
+    system: {
+      platform: process.platform,
+      nodeVersion: process.version,
+      environment: process.env.NODE_ENV || "development",
+      cpuCores: os.cpus().length,
+      loadAverage: os.loadavg(),
+    },
+
+    memory: {
+      rss: process.memoryUsage().rss,
+      heapTotal: process.memoryUsage().heapTotal,
+      heapUsed: process.memoryUsage().heapUsed,
+      freeSystemMemory: os.freemem(),
+      totalSystemMemory: os.totalmem(),
+    },
+
+    services: {
+      database: dbStatusMap[dbState],
+      email: emailConfigured ? "configured" : "missing",
+      cloudinary: process.env.CLOUDINARY_CLOUD_NAME
+        ? "configured"
+        : "missing",
+    },
+  });
+});
+
+/* =======================
+   🔗 Routes
+======================= */
+
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/newsletter", newsletterRoutes);
+app.use("/api/hero", heroRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/brands", brandRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/faq", faqRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/chat", chatRoutes);
+
+/* =======================
+   ❌ Error Handler
+======================= */
+
+app.use((err, req, res, next) => {
+  console.error("🔥 Error:", err.message);
+
+  res.status(500).json({
+    status: "ERROR",
+    message: err.message,
+  });
+});
+
+/* =======================
+   🛢️ MongoDB Connection
+======================= */
+
 mongoose
-  .connect(process.env.MONGO_URI, {
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 10000,
-    retryWrites: true,
-    connectTimeoutMS: 10000,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("MongoDB Connected ✅");
-    // Only start the server after DB connection is established
-    startServer();
+    console.log("✅ MongoDB Connected");
+
+    // Start server only after DB connects
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      verifyEmailConfig();
+    });
   })
   .catch((err) => {
-    console.error("MongoDB Connection Error ❌", err.message);
-    console.error("Make sure MongoDB is running and MONGO_URI is correct");
+    console.error("❌ MongoDB Error:", err.message);
     process.exit(1);
   });
-
-// Verify email configuration
-verifyEmailConfig();
-
-// Setup routes
-const setupRoutes = () => {
-  app.use("/api/auth", authRoutes);
-  app.use("/api/admin", adminRoutes);
-  app.use("/api/products", productRoutes);
-  app.use("/api/newsletter", newsletterRoutes);
-  app.use("/api/heroes", heroRoutes);
-  app.use("/api/cart", cartRoutes);
-  app.use("/api/orders", orderRoutes);
-  app.use("/api/payment", paymentRoutes);
-  app.use("/api/brands", brandRoutes);
-  app.use("/api/contacts", contactRoutes);
-  app.use("/api/faqs", faqRoutes);
-  app.use("/api/chat", chatRoutes);
-
-  // Error handling middleware
-  app.use((err, req, res, next) => {
-    console.error("Global Error Handler:", err);
-    res.status(err.status || 500).json({
-      message: err.message || "Internal Server Error",
-      error: err
-    });
-  });
-};
-
-const startServer = () => {
-  setupRoutes();
-  app.listen(process.env.PORT || 5001, () => {
-    console.log(`Server running on port ${process.env.PORT || 5001} 🚀`);
-  });
-};
-
-// Handle graceful shutdown
-process.on("SIGINT", () => {
-  mongoose.connection.close();
-  console.log("Server gracefully terminated");
-  process.exit(0);
-});
