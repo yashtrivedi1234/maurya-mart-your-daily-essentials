@@ -250,8 +250,6 @@ mongoose
     console.error("❌ MongoDB Error:", err.message);
     process.exit(1);
   });
-<<<<<<< HEAD
-=======
 
 // Verify email configuration
 verifyEmailConfig();
@@ -295,4 +293,3 @@ process.on("SIGINT", () => {
   console.log("Server gracefully terminated");
   process.exit(0);
 });
->>>>>>> 8c10fd2 (something)
