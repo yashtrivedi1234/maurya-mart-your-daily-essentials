@@ -42,6 +42,7 @@ const AdminLayout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("isAdmin");
     navigate("/admin-login");
+    window.location.reload();
   };
 
   return (

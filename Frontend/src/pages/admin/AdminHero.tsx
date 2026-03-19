@@ -48,6 +48,7 @@ const AdminHero = () => {
     highlight: "",
     sub: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -83,6 +84,9 @@ const AdminHero = () => {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsSubmitting(true);
+      console.log("🚀 Creating hero slide...");
+      console.log("📤 API call: POST /api/hero/");
       const formData = new FormData();
       formData.append("badge", currentSlide.badge || "");
       formData.append("heading", currentSlide.heading || "");
@@ -95,17 +99,24 @@ const AdminHero = () => {
       }
 
       await createHeroSlide(formData).unwrap();
+      console.log("✅ Hero slide created successfully");
       toast.success("Hero slide added successfully");
       setIsAddDialogOpen(false);
       resetForm();
     } catch (err) {
+      console.error("❌ Error:", err);
       toast.error("Failed to add hero slide");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsSubmitting(true);
+      console.log("🚀 Updating hero slide...");
+      console.log("📤 API call: PATCH /api/hero/", currentSlide._id);
       const formData = new FormData();
       formData.append("badge", currentSlide.badge || "");
       formData.append("heading", currentSlide.heading || "");
@@ -116,11 +127,15 @@ const AdminHero = () => {
       }
 
       await updateHeroSlide({ id: currentSlide._id!, formData }).unwrap();
+      console.log("✅ Hero slide updated successfully");
       toast.success("Hero slide updated successfully");
       setIsEditDialogOpen(false);
       resetForm();
     } catch (err) {
+      console.error("❌ Error:", err);
       toast.error("Failed to update hero slide");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -134,9 +149,13 @@ const AdminHero = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this slide?")) {
       try {
+        console.log("🚀 Deleting hero slide...");
+        console.log("📤 API call: DELETE /api/hero/", id);
         await deleteHeroSlide(id).unwrap();
+        console.log("✅ Hero slide deleted successfully");
         toast.success("Slide deleted successfully");
       } catch (err) {
+        console.error("❌ Error:", err);
         toast.error("Failed to delete slide");
       }
     }
@@ -200,8 +219,10 @@ const AdminHero = () => {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
-                <Button type="submit">Create Slide</Button>
+                <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isSubmitting}>Cancel</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Creating..." : "Create Slide"}
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -273,8 +294,10 @@ const AdminHero = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">Update Slide</Button>
+              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={isSubmitting}>Cancel</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Updating..." : "Update Slide"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

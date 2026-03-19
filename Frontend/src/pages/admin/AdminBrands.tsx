@@ -46,14 +46,18 @@ export default function AdminBrands() {
 
     try {
       setIsSubmitting(true);
+      console.log("🚀 Uploading brand...");
+      console.log("📤 API call: POST /api/brands/");
       const formData = new FormData();
       formData.append("image", imageFile);
 
       await createBrand(formData).unwrap();
+      console.log("✅ Brand uploaded successfully");
       setImageFile(null);
       setPreview("");
       setIsOpen(false);
     } catch (error: any) {
+      console.error("❌ Error:", error);
       alert("Error uploading brand: " + (error?.data?.message || error?.message));
     } finally {
       setIsSubmitting(false);
@@ -62,8 +66,12 @@ export default function AdminBrands() {
 
   const handleDelete = async (id: string) => {
     try {
+      console.log("🚀 Deleting brand...");
+      console.log("📤 API call: DELETE /api/brands/", id);
       await deleteBrand(id).unwrap();
+      console.log("✅ Brand deleted successfully");
     } catch (error: any) {
+      console.error("❌ Error:", error);
       alert("Error deleting brand: " + (error?.data?.message || error?.message));
     }
   };

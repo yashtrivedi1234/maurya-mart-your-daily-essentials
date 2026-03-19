@@ -43,17 +43,23 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
+    address: "",
+    city: "",
+    pincode: "",
   });
 
-  // Only update form data when displayUser's name/phone actually change
+  // Only update form data when displayUser's details actually change
   useEffect(() => {
     if (displayUser?.name || displayUser?.phone) {
       setFormData({
         name: displayUser.name || "",
         phone: displayUser.phone || "",
+        address: displayUser.address || "",
+        city: displayUser.city || "",
+        pincode: displayUser.pincode || "",
       });
     }
-  }, [displayUser?.name, displayUser?.phone]); // Use specific fields, not the whole object
+  }, [displayUser?.name, displayUser?.phone, displayUser?.address, displayUser?.city, displayUser?.pincode]); // Use specific fields, not the whole object
 
   // Listen for token changes and refresh component
   useEffect(() => {
@@ -72,6 +78,7 @@ const Profile = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/login");
+    window.location.reload();
   };
 
   const handleSave = async () => {
@@ -150,8 +157,9 @@ const Profile = () => {
                 setIsEditing(false);
                 setFormData({
                   name: displayUser.name || "",
-                  phone: displayUser.phone || "",
-                });
+                  phone: displayUser.phone || "",                  address: displayUser.address || "",
+                  city: displayUser.city || "",
+                  pincode: displayUser.pincode || "",                });
               }}>
                 <X className="h-4 w-4 mr-1" /> Cancel
               </Button>
@@ -208,6 +216,48 @@ const Profile = () => {
                         className="mt-1 font-display font-bold text-xl h-12 rounded-xl"
                       />
                     </div>
+                    <div>
+                      <Label htmlFor="phone" className="text-xs font-semibold text-muted-foreground uppercase">Phone Number</Label>
+                      <Input 
+                        id="phone" 
+                        value={formData.phone} 
+                        placeholder="+91 0000000000"
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="mt-1 h-10 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="address" className="text-xs font-semibold text-muted-foreground uppercase">Address</Label>
+                      <Input 
+                        id="address" 
+                        value={formData.address} 
+                        placeholder="Enter your address"
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        className="mt-1 h-10 rounded-lg"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="city" className="text-xs font-semibold text-muted-foreground uppercase">City</Label>
+                        <Input 
+                          id="city" 
+                          value={formData.city} 
+                          placeholder="Enter city"
+                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          className="mt-1 h-10 rounded-lg"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="pincode" className="text-xs font-semibold text-muted-foreground uppercase">Pincode</Label>
+                        <Input 
+                          id="pincode" 
+                          value={formData.pincode} 
+                          placeholder="Enter pincode"
+                          onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                          className="mt-1 h-10 rounded-lg"
+                        />
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -237,18 +287,25 @@ const Profile = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Phone Number</p>
-                    {isEditing ? (
-                      <Input 
-                        value={formData.phone} 
-                        placeholder="+91 0000000000"
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="h-8 mt-1 text-sm rounded-lg"
-                      />
-                    ) : (
-                      <p className="font-semibold">{displayUser.phone || "Not set"}</p>
-                    )}
+                    <p className="font-semibold">{displayUser.phone || "Not set"}</p>
                   </div>
                 </div>
+
+                {(displayUser.address || displayUser.city || displayUser.pincode) && (
+                  <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 transition-all hover:bg-muted/80">
+                    <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-primary shadow-sm border">
+                      <User className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Address</p>
+                      <p className="font-semibold text-sm">
+                        {displayUser.address || "Not set"}
+                        {displayUser.city && `, ${displayUser.city}`}
+                        {displayUser.pincode && ` - ${displayUser.pincode}`}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col justify-between">

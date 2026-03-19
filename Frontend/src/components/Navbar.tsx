@@ -144,6 +144,7 @@ const Navbar = () => {
                       localStorage.removeItem("user");
                       setTokenUpdate(prev => prev + 1); // Trigger re-render
                       navigate("/");
+                      window.location.reload();
                     }}
                   >
                     Logout
@@ -201,6 +202,7 @@ const Navbar = () => {
                       setToken(null);
                       setMobileOpen(false);
                       navigate("/");
+                      window.location.reload();
                     }}
                   >
                     Logout

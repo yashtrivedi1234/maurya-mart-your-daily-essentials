@@ -59,14 +59,19 @@ export default function AdminFAQ() {
 
     try {
       setIsSubmitting(true);
+      console.log("🚀 " + (editingFaq ? "Updating" : "Creating") + " FAQ...");
       if (editingFaq) {
+        console.log("📤 API call: PATCH /api/faq/", editingFaq._id);
         await updateFAQ({ id: editingFaq._id, ...form }).unwrap();
       } else {
+        console.log("📤 API call: POST /api/faq/");
         await createFAQ(form).unwrap();
       }
+      console.log("✅ FAQ " + (editingFaq ? "updated" : "created") + " successfully");
       setIsOpen(false);
       setForm({ category: "", question: "", answer: "" });
     } catch (error: any) {
+      console.error("❌ Error:", error);
       alert("Error: " + (error?.data?.message || error?.message));
     } finally {
       setIsSubmitting(false);
@@ -75,8 +80,12 @@ export default function AdminFAQ() {
 
   const handleDelete = async (id: string) => {
     try {
+      console.log("🚀 Deleting FAQ...");
+      console.log("📤 API call: DELETE /api/faq/", id);
       await deleteFAQ(id).unwrap();
+      console.log("✅ FAQ deleted successfully");
     } catch (error: any) {
+      console.error("❌ Error:", error);
       alert("Error deleting FAQ: " + (error?.data?.message || error?.message));
     }
   };

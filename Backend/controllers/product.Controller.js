@@ -1,5 +1,6 @@
 import { Product } from "../models/product.model.js";
 import { Order } from "../models/order.model.js";
+import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 
@@ -15,7 +16,6 @@ export const getProducts = async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to fetch products",
       error: error.message,
     });
   }
@@ -39,7 +39,6 @@ export const getProductById = async (req, res) => {
     res.status(200).json(product);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to fetch product",
       error: error.message,
     });
   }
@@ -53,7 +52,6 @@ export const getFeaturedProducts = async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to fetch featured products",
       error: error.message,
     });
   }
@@ -69,7 +67,6 @@ export const getNewArrivals = async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to fetch new arrivals",
       error: error.message,
     });
   }
@@ -85,7 +82,6 @@ export const getTrendingProducts = async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to fetch trending products",
       error: error.message,
     });
   }
@@ -117,7 +113,7 @@ export const updateProductStatus = async (req, res) => {
     res.status(200).json(updatedProduct);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to update product status",
+
       error: error.message,
     });
   }
@@ -133,8 +129,9 @@ export const createProduct = async (req, res) => {
       description,
       category,
       rating,
-      reviews,
+      numReviews,
       stock,
+      isFeatured,
       isNewArrival,
       isTrending,
       highlights,
@@ -173,7 +170,7 @@ export const createProduct = async (req, res) => {
       image: result.url,
       image_public_id: result.public_id,
       rating: rating ? parseFloat(rating) : 0,
-      reviews: reviews ? parseInt(reviews) : 0,
+      numReviews: numReviews ? parseInt(numReviews) : 0,
       stock: stock ? parseInt(stock) : 0,
       isFeatured: toBoolean(isFeatured),
       isNewArrival: toBoolean(isNewArrival),
@@ -190,7 +187,6 @@ export const createProduct = async (req, res) => {
     res.status(201).json(createdProduct);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to create product",
       error: error.message,
     });
   }
@@ -247,8 +243,8 @@ export const updateProduct = async (req, res) => {
     if (req.body.rating !== undefined)
       product.rating = parseFloat(req.body.rating);
 
-    if (req.body.reviews !== undefined)
-      product.reviews = parseInt(req.body.reviews);
+    if (req.body.numReviews !== undefined)
+      product.numReviews = parseInt(req.body.numReviews);
 
     if (req.body.isFeatured !== undefined)
       product.isFeatured = toBoolean(req.body.isFeatured);
@@ -279,7 +275,6 @@ export const updateProduct = async (req, res) => {
     res.status(200).json(updatedProduct);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to update product",
       error: error.message,
     });
   }
@@ -309,7 +304,6 @@ export const deleteProduct = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: "Failed to delete product",
       error: error.message,
     });
   }
@@ -329,7 +323,7 @@ export const canUserReview = async (req, res) => {
 
     res.status(200).json({ canReview: !!hasPurchased });
   } catch (error) {
-    res.status(500).json({ message: "Error checking review status", error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -363,9 +357,13 @@ export const addProductReview = async (req, res) => {
       return res.status(403).json({ message: "Only verified buyers can review products" });
     }
 
-    // 3. Add review
+    // 3. Get user details to get the name
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // 4. Add review
     const review = {
-      name: req.user.name,
+      name: user.name,
       rating: Number(rating),
       comment,
       user: userId,
@@ -380,6 +378,6 @@ export const addProductReview = async (req, res) => {
     await product.save();
     res.status(201).json({ message: "Review added successfully", product });
   } catch (error) {
-    res.status(500).json({ message: "Failed to add review", error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };

@@ -76,6 +76,32 @@ const productSchema = new mongoose.Schema(
     ],
     inTheBox: [String],
     bankOffers: [String],
+    // Delivery & Seller Info
+    soldLastMonth: {
+      type: Number,
+      default: 0,
+    },
+    deliveryInfo: {
+      standard: { type: String, default: "Free Delivery" },
+      standardDays: { type: String, default: "3-5 business days" },
+      express: { type: String, default: "" },
+      expressDays: { type: String, default: "" },
+      expressPrice: { type: Number, default: 0 },
+    },
+    sellerInfo: {
+      name: { type: String, default: "MaurMart" },
+      rating: { type: Number, default: 0 },
+      ratingPercentage: { type: String, default: "" },
+    },
+    returnPolicy: {
+      days: { type: Number, default: 30 },
+      description: { type: String, default: "Easy returns within specified days" },
+    },
+    warranty: {
+      duration: { type: String, default: "" },
+      description: { type: String, default: "" },
+    },
+    paymentMethods: [String],
   },
   { timestamps: true }
 );

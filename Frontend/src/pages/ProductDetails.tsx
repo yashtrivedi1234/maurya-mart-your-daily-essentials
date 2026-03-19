@@ -3,7 +3,7 @@ import {
   ArrowLeft, Star, ShoppingCart, Truck, Shield, RotateCcw,
   Minus, Plus, Heart, Share2, CheckCircle2, XCircle,
   ChevronDown, ChevronUp, ThumbsUp, ThumbsDown, Package,
-  Zap, Award, Clock, MapPin, RefreshCw, ChevronRight,
+  RefreshCw, ChevronRight, Zap,
   Maximize2
 } from "lucide-react";
 import { useState } from "react";
@@ -147,7 +147,7 @@ const ProductDetails = () => {
   const avgRating = typeof product.rating === 'number' ? product.rating.toFixed(1) : "0.0";
 
   const breakdown = [5, 4, 3, 2, 1].map(stars => {
-    const count = product.reviews?.filter(r => Math.round(r.rating || 0) === stars)?.length || 0;
+    const count = (Array.isArray(product.reviews) ? product.reviews : []).filter(r => Math.round(r.rating || 0) === stars)?.length || 0;
     const pct = totalReviews > 0 ? Math.round((count / totalReviews) * 100) : 0;
     return { stars, count, pct };
   });
@@ -255,8 +255,18 @@ const ProductDetails = () => {
             {/* Rating summary */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="flex">{<StarRow rating={product.rating || 0} size="h-5 w-5" />}</div>
-              <span className="text-muted-foreground text-sm">|</span>
-              <span className="text-sm text-green-600 font-medium">1,200+ sold last month</span>
+              {product.numReviews > 0 && (
+                <>
+                  <span className="text-muted-foreground text-sm">|</span>
+                  <span className="text-sm text-green-600 font-medium">{product.numReviews} reviews</span>
+                </>
+              )}
+              {(product as any).soldLastMonth > 0 && (
+                <>
+                  <span className="text-muted-foreground text-sm">|</span>
+                  <span className="text-sm text-green-600 font-medium">{(product as any).soldLastMonth.toLocaleString()}+ sold</span>
+                </>
+              )}
             </div>
 
             <Separator />
@@ -372,20 +382,9 @@ const ProductDetails = () => {
                 <div className="flex items-start gap-3 text-sm">
                   <Truck className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                   <div>
-                    <p className="font-medium text-foreground">FREE Delivery</p>
-                    <p className="text-muted-foreground text-xs">By <strong>Thursday, 20 March</strong></p>
+                    <p className="font-medium text-foreground">{(product as any).deliveryInfo?.standard || "Free Delivery"}</p>
+                    <p className="text-muted-foreground text-xs">{(product as any).deliveryInfo?.standardDays || "Standard delivery"}</p>
                   </div>
-                </div>
-                <div className="flex items-start gap-3 text-sm">
-                  <Zap className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="font-medium text-foreground">Express Delivery</p>
-                    <p className="text-muted-foreground text-xs">Tomorrow by 10 PM · ₹49</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <p className="text-xs text-muted-foreground">Delivering to <span className="text-primary font-medium cursor-pointer hover:underline">Lucknow 226001</span></p>
                 </div>
               </div>
 
@@ -395,13 +394,14 @@ const ProductDetails = () => {
               <div className="space-y-2">
                 <h3 className="font-semibold text-foreground text-sm uppercase tracking-wide">Sold by</h3>
                 <div className="flex items-center justify-between">
-                  <span className="text-primary text-sm font-medium hover:underline cursor-pointer">MaurMart Store Official</span>
-                  <Badge variant="secondary" className="text-xs">98% positive</Badge>
+                  <span className="text-primary text-sm font-medium">{(product as any).sellerInfo?.name || "MaurMart"}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Award className="h-3.5 w-3.5 text-yellow-500" />
-                  <span className="text-xs text-muted-foreground">Top rated seller · 4.8★</span>
-                </div>
+                {(product as any).sellerInfo?.rating > 0 && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className="text-yellow-500">★</span>
+                    <span>{(product as any).sellerInfo?.rating.toFixed(1)} rating</span>
+                  </div>
+                )}
               </div>
 
               <Separator />
@@ -411,53 +411,63 @@ const ProductDetails = () => {
                 <h3 className="font-semibold text-foreground text-sm uppercase tracking-wide">Returns</h3>
                 <div className="flex items-start gap-2 text-sm">
                   <RefreshCw className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                  <p className="text-muted-foreground text-xs">Eligible for return within <strong className="text-foreground">30 days</strong> of delivery.</p>
+                  <div>
+                    {(product as any).returnPolicy?.days > 0 && (
+                      <p className="text-muted-foreground text-xs">
+                        Eligible for return within <strong className="text-foreground">{(product as any).returnPolicy?.days} days</strong> of delivery.
+                      </p>
+                    )}
+                    {(product as any).returnPolicy?.description && (
+                      <p className="text-muted-foreground text-xs mt-1">{(product as any).returnPolicy?.description}</p>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-start gap-2 text-sm">
-                  <Shield className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                  <p className="text-muted-foreground text-xs"><strong className="text-foreground">1 Year Warranty</strong> by manufacturer.</p>
-                </div>
+                {(product as any).warranty?.duration && (
+                  <div className="flex items-start gap-2 text-sm mt-2">
+                    <Shield className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <p className="text-muted-foreground text-xs">
+                      <strong className="text-foreground">{(product as any).warranty?.duration}</strong>
+                      {(product as any).warranty?.description && ` - ${(product as any).warranty?.description}`}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <Separator />
 
-              {/* Payment icons */}
-              <div className="space-y-2">
-                <h3 className="font-semibold text-foreground text-sm uppercase tracking-wide">Secure Payment</h3>
-                <div className="flex flex-wrap gap-2">
-                  {["UPI", "Cards", "NetBanking", "EMI", "Wallet"].map((m) => (
-                    <span key={m} className="text-xs border border-border rounded px-2 py-0.5 text-muted-foreground bg-secondary/40">{m}</span>
-                  ))}
+              {/* Payment Methods */}
+              {(product as any).paymentMethods && (product as any).paymentMethods.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-foreground text-sm uppercase tracking-wide">Accepted Payment Methods</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {(product as any).paymentMethods.map((method: string) => (
+                      <span key={method} className="text-xs border border-border rounded px-2.5 py-1 text-muted-foreground bg-secondary/40">
+                        {method}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
 
-            {/* EMI callout */}
-            <div className="border border-border rounded-xl p-4 bg-secondary/30">
-              <p className="text-sm font-semibold text-foreground mb-1 flex items-center gap-2">
-                <Clock className="h-4 w-4 text-primary" /> No Cost EMI
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Starting from <strong className="text-foreground">₹{Math.round(product.price / 12).toLocaleString("en-IN")}/mo</strong> for 12 months on select cards.
-              </p>
-            </div>
+              <Separator />
 
-            {/* Package contents */}
-            {product.inTheBox && product.inTheBox.length > 0 && (
-              <div className="border border-border rounded-xl p-4">
-                <p className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-                  <Package className="h-4 w-4 text-primary" /> What's in the box
-                </p>
-                <ul className="text-xs text-muted-foreground space-y-1">
-                  {product.inTheBox.map((item) => (
-                    <li key={item} className="flex items-center gap-2">
-                      <span className="h-1 w-1 rounded-full bg-muted-foreground inline-block" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              {/* Package contents */}
+              {product.inTheBox && product.inTheBox.length > 0 && (
+                <div className="border border-border rounded-xl p-4">
+                  <p className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                    <Package className="h-4 w-4 text-primary" /> What's in the box
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    {product.inTheBox.map((item) => (
+                      <li key={item} className="flex items-center gap-2">
+                        <span className="h-1 w-1 rounded-full bg-muted-foreground inline-block" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -500,7 +510,7 @@ const ProductDetails = () => {
                 })}
               </div>
               
-              {canReview && (
+              {canReview ? (
                 <div className="sm:border-l sm:pl-6 w-full sm:w-auto flex flex-col items-center justify-center">
                   <p className="text-sm font-medium mb-3 text-center">Share your thoughts</p>
                   <Button 
@@ -508,6 +518,29 @@ const ProductDetails = () => {
                     className="gap-2 shadow-lg shadow-primary/20"
                   >
                     <MessageSquare className="h-4 w-4" /> Write a Review
+                  </Button>
+                </div>
+              ) : localStorage.getItem("token") ? (
+                <div className="sm:border-l sm:pl-6 w-full sm:w-auto flex flex-col items-center justify-center p-4 bg-blue-50/50 dark:bg-blue-950/20 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
+                  <p className="text-sm font-medium text-center text-blue-900 dark:text-blue-200">
+                    Only verified buyers can review this product
+                  </p>
+                  <p className="text-xs text-blue-700/70 dark:text-blue-300/70 text-center mt-1">
+                    Purchase this product to share your feedback
+                  </p>
+                </div>
+              ) : (
+                <div className="sm:border-l sm:pl-6 w-full sm:w-auto flex flex-col items-center justify-center p-4 bg-amber-50/50 dark:bg-amber-950/20 rounded-lg border border-amber-200/50 dark:border-amber-800/50">
+                  <p className="text-sm font-medium text-center text-amber-900 dark:text-amber-200">
+                    Sign in to write a review
+                  </p>
+                  <Button 
+                    variant="link" 
+                    size="sm" 
+                    className="text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 mt-2"
+                    onClick={() => navigate("/login")}
+                  >
+                    Sign In
                   </Button>
                 </div>
               )}

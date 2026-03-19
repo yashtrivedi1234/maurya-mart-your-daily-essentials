@@ -42,16 +42,24 @@ export default function AdminContact() {
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
+      console.log("🚀 Updating contact status...");
+      console.log("📤 API call: PATCH /api/contact/", id, "status:", newStatus);
       await updateStatus({ id, status: newStatus }).unwrap();
+      console.log("✅ Contact status updated successfully");
     } catch (error: any) {
+      console.error("❌ Error:", error);
       alert("Error updating status: " + (error?.data?.message || error?.message));
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
+      console.log("🚀 Deleting contact...");
+      console.log("📤 API call: DELETE /api/contact/", id);
       await deleteContact(id).unwrap();
+      console.log("✅ Contact deleted successfully");
     } catch (error: any) {
+      console.error("❌ Error:", error);
       alert("Error deleting contact: " + (error?.data?.message || error?.message));
     }
   };
