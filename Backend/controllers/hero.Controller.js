@@ -1,5 +1,6 @@
 import { HeroSlide } from "../models/hero.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
+import { getIO } from "../utils/socketManager.js";
 
 // @desc    Get all hero slides
 // @route   GET /api/heroes
@@ -41,6 +42,15 @@ export const createHeroSlide = async (req, res) => {
     });
 
     const createdSlide = await slide.save();
+    
+    // 📡 Broadcast hero slide created event
+    const io = getIO();
+    io.emit("heroSlideCreated", {
+      slide: createdSlide,
+      message: "New hero slide added",
+      timestamp: new Date(),
+    });
+    
     res.status(201).json(createdSlide);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -59,6 +69,15 @@ export const deleteHeroSlide = async (req, res) => {
         await deleteFromCloudinary(slide.image_public_id);
       }
       await slide.deleteOne();
+      
+      // 📡 Broadcast hero slide deleted event
+      const io = getIO();
+      io.emit("heroSlideDeleted", {
+        slideId: slide._id,
+        message: "Hero slide removed",
+        timestamp: new Date(),
+      });
+      
       res.json({ message: "Slide removed" });
     } else {
       res.status(404).json({ message: "Slide not found" });
@@ -95,6 +114,15 @@ export const updateHeroSlide = async (req, res) => {
         slide.sub = req.body.sub || slide.sub;
 
         const updatedSlide = await slide.save();
+        
+        // 📡 Broadcast hero slide updated event
+        const io = getIO();
+        io.emit("heroSlideUpdated", {
+          slide: updatedSlide,
+          message: "Hero slide updated",
+          timestamp: new Date(),
+        });
+        
         res.json(updatedSlide);
     } else {
         res.status(404).json({ message: "Slide not found" });

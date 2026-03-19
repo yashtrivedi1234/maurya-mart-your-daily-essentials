@@ -1,5 +1,6 @@
 import { Testimonial } from "../models/testimonial.model.js";
 import mongoose from "mongoose";
+import { getIO } from "../utils/socketManager.js";
 
 /* ════════════════════════════════════════════════════════════════════════════ */
 /*                          ADMIN - CREATE TESTIMONIAL                          */
@@ -39,6 +40,15 @@ export const createTestimonial = async (req, res) => {
     });
 
     const savedTestimonial = await testimonial.save();
+    
+    // 📡 Broadcast testimonial created event
+    const io = getIO();
+    io.emit("testimonialCreated", {
+      testimonial: savedTestimonial,
+      message: `New testimonial from ${savedTestimonial.name}`,
+      timestamp: new Date(),
+    });
+    
     res.status(201).json(savedTestimonial);
   } catch (error) {
     res.status(500).json({
@@ -179,6 +189,14 @@ export const updateTestimonial = async (req, res) => {
       return res.status(404).json({ message: "Testimonial not found" });
     }
 
+    // 📡 Broadcast testimonial updated event
+    const io = getIO();
+    io.emit("testimonialUpdated", {
+      testimonial,
+      message: `Testimonial updated from ${testimonial.name}`,
+      timestamp: new Date(),
+    });
+
     res.status(200).json(testimonial);
   } catch (error) {
     res.status(500).json({
@@ -204,6 +222,14 @@ export const deleteTestimonial = async (req, res) => {
     if (!testimonial) {
       return res.status(404).json({ message: "Testimonial not found" });
     }
+
+    // 📡 Broadcast testimonial deleted event
+    const io = getIO();
+    io.emit("testimonialDeleted", {
+      testimonialId: testimonial._id,
+      message: `Testimonial deleted from ${testimonial.name}`,
+      timestamp: new Date(),
+    });
 
     res.status(200).json({ message: "Testimonial deleted successfully" });
   } catch (error) {

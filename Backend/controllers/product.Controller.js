@@ -3,6 +3,7 @@ import { Order } from "../models/order.model.js";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
+import { getIO } from "../utils/socketManager.js";
 
 /* ----------------------------- HELPER FUNCTIONS ----------------------------- */
 
@@ -97,18 +98,30 @@ export const updateProductStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid product ID" });
     }
 
-    const product = await Product.findById(id);
+    const updateData = {};
+    if (isFeatured !== undefined) updateData.isFeatured = toBoolean(isFeatured);
+    if (isNewArrival !== undefined) updateData.isNewArrival = toBoolean(isNewArrival);
+    if (isTrending !== undefined) updateData.isTrending = toBoolean(isTrending);
 
-    if (!product) {
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedProduct) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    if (isFeatured !== undefined) product.isFeatured = toBoolean(isFeatured);
-    if (isNewArrival !== undefined)
-      product.isNewArrival = toBoolean(isNewArrival);
-    if (isTrending !== undefined) product.isTrending = toBoolean(isTrending);
-
-    const updatedProduct = await product.save();
+    // 📡 Broadcast product status changed event
+    const io = getIO();
+    io.emit("productStatusChanged", {
+      product: updatedProduct,
+      message: `Product status updated: ${updatedProduct.name}`,
+      isFeatured: updatedProduct.isFeatured,
+      isNewArrival: updatedProduct.isNewArrival,
+      isTrending: updatedProduct.isTrending,
+      timestamp: new Date(),
+    });
 
     res.status(200).json(updatedProduct);
   } catch (error) {
@@ -183,6 +196,14 @@ export const createProduct = async (req, res) => {
     });
 
     const createdProduct = await product.save();
+
+    // 📡 Broadcast product created event
+    const io = getIO();
+    io.emit("productCreated", {
+      product: createdProduct,
+      message: `New product: ${createdProduct.name}`,
+      timestamp: new Date(),
+    });
 
     res.status(201).json(createdProduct);
   } catch (error) {
@@ -272,6 +293,14 @@ export const updateProduct = async (req, res) => {
 
     const updatedProduct = await product.save();
 
+    // 📡 Broadcast product updated event
+    const io = getIO();
+    io.emit("productUpdated", {
+      product: updatedProduct,
+      message: `Product updated: ${updatedProduct.name}`,
+      timestamp: new Date(),
+    });
+
     res.status(200).json(updatedProduct);
   } catch (error) {
     res.status(500).json({
@@ -298,6 +327,15 @@ export const deleteProduct = async (req, res) => {
     if (product.image_public_id) {
       await deleteFromCloudinary(product.image_public_id);
     }
+
+    // 📡 Broadcast product deleted event
+    const io = getIO();
+    io.emit("productDeleted", {
+      productId: product._id,
+      productName: product.name,
+      message: `Product deleted: ${product.name}`,
+      timestamp: new Date(),
+    });
 
     res.status(200).json({
       message: "Product removed successfully",

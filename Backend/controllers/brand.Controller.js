@@ -1,5 +1,6 @@
 import { Brand } from "../models/brand.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
+import { getIO } from "../utils/socketManager.js";
 
 /* ─── GET ALL BRANDS ─── */
 export const getBrands = async (req, res) => {
@@ -37,6 +38,15 @@ export const createBrand = async (req, res) => {
     });
 
     const createdBrand = await brand.save();
+    
+    // 📡 Broadcast brand created event
+    const io = getIO();
+    io.emit("brandCreated", {
+      brand: createdBrand,
+      message: "New brand added",
+      timestamp: new Date(),
+    });
+    
     res.status(201).json(createdBrand);
   } catch (error) {
     res.status(500).json({
@@ -61,6 +71,15 @@ export const deleteBrand = async (req, res) => {
     }
 
     await Brand.findByIdAndDelete(id);
+    
+    // 📡 Broadcast brand deleted event
+    const io = getIO();
+    io.emit("brandDeleted", {
+      brandId: brand._id,
+      message: "Brand deleted",
+      timestamp: new Date(),
+    });
+    
     res.json({ message: "Brand deleted successfully" });
   } catch (error) {
     res.status(500).json({

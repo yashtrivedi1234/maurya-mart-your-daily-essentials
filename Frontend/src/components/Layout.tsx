@@ -3,8 +3,13 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import Chatbot from "./Chatbot";
 import { ScrollToTop } from "./ScrollToTop";
+import LiveUpdateIndicator from "./LiveUpdateIndicator";
+import { useRealTimeUpdates } from "@/hooks/useRealTimeUpdates";
 
 const Layout = () => {
+  // Initialize real-time socket updates
+  useRealTimeUpdates();
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -14,6 +19,7 @@ const Layout = () => {
       <Footer />
       <Chatbot />
       <ScrollToTop />
+      <LiveUpdateIndicator />
     </div>
   );
 };
