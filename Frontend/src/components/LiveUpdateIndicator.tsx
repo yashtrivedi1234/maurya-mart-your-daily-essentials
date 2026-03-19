@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Check, Zap } from "lucide-react";
-import io from "socket.io-client";
+import { useSocket } from "@/context/SocketContext";
 
 /**
  * LiveUpdateIndicator Component
@@ -9,20 +9,31 @@ import io from "socket.io-client";
 const LiveUpdateIndicator: React.FC = () => {
   const [lastUpdate, setLastUpdate] = useState<string>("");
   const [isVisible, setIsVisible] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { socket } = useSocket();
 
   useEffect(() => {
-    const socket = io();
+    if (!socket) {
+      console.log("⏳ LiveUpdateIndicator: Waiting for socket connection...");
+      return;
+    }
+
+    console.log("✅ LiveUpdateIndicator socket connected:", socket.id);
 
     const showUpdate = (message: string) => {
+      console.log("🔔 Update notification:", message);
       setLastUpdate(message);
       setIsVisible(true);
 
+      // Clear any existing timer
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+
       // Auto-hide after 3 seconds
-      const timer = setTimeout(() => {
+      timerRef.current = setTimeout(() => {
         setIsVisible(false);
       }, 3000);
-
-      return () => clearTimeout(timer);
     };
 
     // Listen to various update events
@@ -47,14 +58,18 @@ const LiveUpdateIndicator: React.FC = () => {
     socket.on("testimonialDeleted", () => showUpdate("⭐ Testimonial removed"));
 
     return () => {
-      socket.disconnect();
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      console.log("🧹 LiveUpdateIndicator: Cleaning up event listeners");
+      socket.offAny();
     };
-  }, []);
+  }, [socket]);
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 animate-in slide-in-from-bottom-4">
+    <div className="fixed bottom-6 left-6 z-50 animate-in slide-in-from-bottom-4 duration-300">
       <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 shadow-lg flex items-center gap-3 min-w-max">
         <div className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500">
           <Check className="w-3 h-3 text-white" />

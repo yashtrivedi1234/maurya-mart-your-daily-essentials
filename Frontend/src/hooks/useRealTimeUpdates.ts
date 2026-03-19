@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import io from "socket.io-client";
+import { useSocket } from "@/context/SocketContext";
 import { productApi } from "@/store/api/productApi";
 import { brandApi } from "@/store/api/brandApi";
 import { heroApi } from "@/store/api/heroApi";
@@ -15,100 +15,103 @@ import { recommendationApi } from "@/store/api/recommendationApi";
  */
 export const useRealTimeUpdates = () => {
   const dispatch = useDispatch();
+  const { socket } = useSocket();
 
   useEffect(() => {
-    const socket = io();
+    if (!socket) {
+      console.log("⏳ Waiting for socket connection...");
+      return;
+    }
 
-    console.log("🔌 Real-time listener initialized");
+    console.log("🔄 Setting up real-time event listeners");
 
     /* ─── PRODUCT EVENTS ─── */
     socket.on("productCreated", (data) => {
-      console.log("📦 Product created:", data);
-      // Invalidate product caches to refetch
+      console.log("📦 Product created event received:", data);
       dispatch(productApi.util.invalidateTags(["Product"]));
       dispatch(recommendationApi.util.invalidateTags(["Recommendation"]));
     });
 
     socket.on("productUpdated", (data) => {
-      console.log("📦 Product updated:", data);
+      console.log("📦 Product updated event received:", data);
       dispatch(productApi.util.invalidateTags(["Product"]));
       dispatch(recommendationApi.util.invalidateTags(["Recommendation"]));
     });
 
     socket.on("productDeleted", (data) => {
-      console.log("📦 Product deleted:", data);
+      console.log("📦 Product deleted event received:", data);
       dispatch(productApi.util.invalidateTags(["Product"]));
       dispatch(recommendationApi.util.invalidateTags(["Recommendation"]));
     });
 
     socket.on("productStatusChanged", (data) => {
-      console.log("📦 Product status changed:", data);
+      console.log("📦 Product status changed event received:", data);
       dispatch(productApi.util.invalidateTags(["Product"]));
       dispatch(recommendationApi.util.invalidateTags(["Recommendation"]));
     });
 
     /* ─── BRAND EVENTS ─── */
     socket.on("brandCreated", (data) => {
-      console.log("🏷️  Brand created:", data);
+      console.log("🏷️  Brand created event received:", data);
       dispatch(brandApi.util.invalidateTags(["Brand"]));
     });
 
     socket.on("brandDeleted", (data) => {
-      console.log("🏷️  Brand deleted:", data);
+      console.log("🏷️  Brand deleted event received:", data);
       dispatch(brandApi.util.invalidateTags(["Brand"]));
     });
 
     /* ─── HERO SLIDE EVENTS ─── */
     socket.on("heroSlideCreated", (data) => {
-      console.log("🎬 Hero slide created:", data);
+      console.log("🎬 Hero slide created event received:", data);
       dispatch(heroApi.util.invalidateTags(["Hero"]));
     });
 
     socket.on("heroSlideUpdated", (data) => {
-      console.log("🎬 Hero slide updated:", data);
+      console.log("🎬 Hero slide updated event received:", data);
       dispatch(heroApi.util.invalidateTags(["Hero"]));
     });
 
     socket.on("heroSlideDeleted", (data) => {
-      console.log("🎬 Hero slide deleted:", data);
+      console.log("🎬 Hero slide deleted event received:", data);
       dispatch(heroApi.util.invalidateTags(["Hero"]));
     });
 
     /* ─── FAQ EVENTS ─── */
     socket.on("faqCreated", (data) => {
-      console.log("❓ FAQ created:", data);
+      console.log("❓ FAQ created event received:", data);
       dispatch(faqApi.util.invalidateTags(["FAQ"]));
     });
 
     socket.on("faqUpdated", (data) => {
-      console.log("❓ FAQ updated:", data);
+      console.log("❓ FAQ updated event received:", data);
       dispatch(faqApi.util.invalidateTags(["FAQ"]));
     });
 
     socket.on("faqDeleted", (data) => {
-      console.log("❓ FAQ deleted:", data);
+      console.log("❓ FAQ deleted event received:", data);
       dispatch(faqApi.util.invalidateTags(["FAQ"]));
     });
 
     /* ─── TESTIMONIAL EVENTS ─── */
     socket.on("testimonialCreated", (data) => {
-      console.log("⭐ Testimonial created:", data);
+      console.log("⭐ Testimonial created event received:", data);
       dispatch(testimonialApi.util.invalidateTags(["Testimonial"]));
     });
 
     socket.on("testimonialUpdated", (data) => {
-      console.log("⭐ Testimonial updated:", data);
+      console.log("⭐ Testimonial updated event received:", data);
       dispatch(testimonialApi.util.invalidateTags(["Testimonial"]));
     });
 
     socket.on("testimonialDeleted", (data) => {
-      console.log("⭐ Testimonial deleted:", data);
+      console.log("⭐ Testimonial deleted event received:", data);
       dispatch(testimonialApi.util.invalidateTags(["Testimonial"]));
     });
 
     return () => {
-      socket.disconnect();
-      console.log("❌ Real-time listener disconnected");
+      console.log("🧹 Cleaning up real-time event listeners");
+      socket.offAny();
     };
-  }, [dispatch]);
+  }, [socket, dispatch]);
 };

@@ -73,6 +73,33 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /* =======================
+   🌐 CORS Setup (Must be before Socket.IO init)
+======================= */
+
+const defaultOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:8080",
+  "http://localhost:8081",
+  "http://127.0.0.1:8081",
+  "http://localhost:8082",
+  "http://127.0.0.1:8082",
+  "https://maurmart.vercel.app",
+  "https://maurmart.onrender.com",
+  "https://maurmart.com",
+  "https://www.maurmart.com"
+];
+
+const envOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
+
+console.log("📋 Allowed CORS Origins:", allowedOrigins);
+
+/* =======================
    🚀 App Init
 ======================= */
 
@@ -97,27 +124,6 @@ const serverStartTime = new Date();
 
 // Store connected admins for broadcasting
 const connectedAdmins = new Set();
-
-/* =======================
-   🌐 CORS Setup
-======================= */
-
-const defaultOrigins = [
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "http://localhost:8080",
-  "https://maurmart.vercel.app",
-  "https://maurmart.onrender.com",
-  "https://maurmart.com",
-  "https://www.maurmart.com"
-];
-
-const envOrigins = (process.env.CORS_ORIGINS || "")
-  .split(",")
-  .map((o) => o.trim())
-  .filter(Boolean);
-
-const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
 
 app.use(
   cors({
