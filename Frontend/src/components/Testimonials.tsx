@@ -68,7 +68,7 @@ const Testimonials = () => {
             <iframe
               src="https://widgets.sociablekit.com/google-reviews/iframe/25664316"
               width="100%"
-              height="800"
+              height="300"
               style={{ border: "none", display: "block" }}
               title="Google Reviews"
               loading="lazy"
