@@ -1,4 +1,4 @@
-import { Star, ShoppingCart, Eye } from "lucide-react";
+import { Star, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/store/api/productApi";
@@ -36,9 +36,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
     : 0;
 
   const stockInfo = getStockStatus(product.stock || 0);
+  const productPath = `/shop/${product._id}`;
+
+  const handleCardClick = () => {
+    navigate(productPath);
+  };
+
+  const handleCardKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      navigate(productPath);
+    }
+  };
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!localStorage.getItem("token")) {
       toast.error("Please login to add items to cart");
       navigate("/login");
@@ -59,6 +72,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (isInWishlist) {
       dispatch(removeFromWishlist(product._id));
       toast.success("Removed from wishlist");
@@ -78,9 +92,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className={`group bg-card rounded-xl border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+    <div className={`group cursor-pointer bg-card rounded-xl border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
       stockInfo.status === "lowStock" ? "border-orange-200 bg-orange-50/30" : ""
-    } ${stockInfo.status === "outOfStock" ? "opacity-75" : ""}`}>
+    } ${stockInfo.status === "outOfStock" ? "opacity-75" : ""}`}
+      role="link"
+      tabIndex={0}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+    >
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-muted">
         <img
@@ -175,23 +194,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
         )}
 
         {/* Actions */}
-        <div className="flex gap-2 pt-1">
+        <div className="pt-1">
             <Button
               size="sm"
-              className="flex-1 gap-1.5"
+              className="w-full gap-1.5"
               disabled={product.stock <= 0 || isLoading}
               onClick={handleAddToCart}
             >
             <ShoppingCart className="h-3.5 w-3.5" />
             {product.stock <= 0 ? "Out of Stock" : "Add to Cart"}
-          </Button>
-          <Button 
-            size="sm" 
-            variant="outline" 
-            className="px-3"
-            onClick={() => navigate(`/shop/${product._id}`)}
-          >
-            <Eye className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>

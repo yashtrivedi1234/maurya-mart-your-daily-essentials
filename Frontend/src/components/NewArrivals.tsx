@@ -13,7 +13,7 @@ const NewArrivals = () => {
   ).slice(0, 4) : [];
 
   return (
-    <section className="py-16">
+    <section className="py-8">
       <div className="container mx-auto px-4">
         <div className="flex items-center gap-3 mb-2">
           <Sparkles className="h-6 w-6 text-primary" />

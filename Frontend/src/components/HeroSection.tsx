@@ -97,28 +97,7 @@ const HeroSection = () => {
         </>
       )}
 
-      {/* Trust bar */}
-      <div className="bg-background border-b border-border relative z-20">
-        <div className="container mx-auto px-4 py-5">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { icon: Truck, title: "Free Delivery", desc: "On orders above ₹499" },
-              { icon: Shield, title: "Secure Payment", desc: "100% protected" },
-              { icon: RotateCcw, title: "Easy Returns", desc: "7-day return policy" },
-            ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex items-center gap-3 justify-center">
-                <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
-                  <Icon className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-foreground">{title}</p>
-                  <p className="text-xs text-muted-foreground">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+     
     </section>
   );
 };

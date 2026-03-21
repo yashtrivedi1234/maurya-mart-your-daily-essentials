@@ -9,7 +9,7 @@ const FAQPreview = () => {
   if (!isLoading && previewFaqs.length === 0) return null;
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-8 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>

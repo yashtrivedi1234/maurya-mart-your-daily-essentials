@@ -35,9 +35,9 @@ const CTASection = () => {
   };
 
   return (
-    <section className="py-16">
+    <section className="py-8">
       <div className="container mx-auto px-4">
-        <div className="hero-gradient rounded-2xl p-10 md:p-16 text-center relative overflow-hidden">
+        <div className="hero-gradient rounded-2xl p-10  text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(160_50%_40%/0.3),transparent_60%)]" />
           <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-primary-foreground mb-4">

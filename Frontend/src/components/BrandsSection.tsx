@@ -19,11 +19,17 @@ const BrandsSection = () => {
   }
 
   return (
-    <section className="py-4 border-y border-border">
+    <section className="py-8 border-y border-border">
       <div className="container mx-auto px-4">
-        <p className="text-center text-sm font-medium text-muted-foreground  tracking-wide uppercase">
-          Trusted Brands We Partner With
-        </p>
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
+            Brands You Trust
+          </h2>
+          <p className="mt-3 text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            Trusted brands we partner with
+          </p>
+        </div>
+
         <div className="flex flex-wrap items-center justify-center gap-4 md:gap-7">
           {brands.map((brand: any) => (
             <div

@@ -25,7 +25,7 @@ const trustItems = [
 
 const TrustSection = () => {
   return (
-    <section className="py-16">
+    <section className="py-8">
       <div className="container mx-auto px-4">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <h2 className="text-3xl font-display font-bold text-foreground">Why customers keep coming back</h2>

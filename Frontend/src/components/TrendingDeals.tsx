@@ -13,7 +13,7 @@ const TrendingDeals = () => {
   const deals = products?.filter((product: Product) => product.isTrending).slice(0, 4) || [];
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-8 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="flex items-center gap-3 mb-2">
           <Flame className="h-6 w-6 text-destructive animate-bounce" />

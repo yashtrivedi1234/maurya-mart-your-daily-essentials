@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 
 const Testimonials = () => {
   return (
-    <section className="py-20 relative overflow-hidden bg-background">
+    <section className="py-8 relative overflow-hidden bg-background">
       {/* Dot-grid background */}
       <div
         className="absolute inset-0 pointer-events-none opacity-40"

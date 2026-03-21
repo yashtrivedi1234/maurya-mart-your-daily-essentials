@@ -12,7 +12,7 @@ const FeaturedProducts = () => {
   const featured = products?.slice(0, 8) || [];
 
   return (
-    <section className="py-16">
+    <section className="py-8">
       <div className="container mx-auto px-4">
         <div className="flex items-end justify-between mb-12">
           <div>

@@ -85,6 +85,30 @@
   * {
     @apply border-border;
   }
+
+  a[href],
+  button:not(:disabled),
+  [role="button"],
+  [role="link"],
+  summary,
+  label[for],
+  select,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="range"] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    cursor: not-allowed;
+  }
+
   body {
     @apply bg-background text-foreground font-sans;
   }

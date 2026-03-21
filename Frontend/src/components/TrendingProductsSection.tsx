@@ -16,7 +16,7 @@ const TrendingProductsSection: React.FC<TrendingProductsSectionProps> = ({
 
   if (isLoading) {
     return (
-      <section className="py-12">
+      <section className="py-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-2 mb-8">
             <Flame className="w-8 h-8 text-orange-600" />
