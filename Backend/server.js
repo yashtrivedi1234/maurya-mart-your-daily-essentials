@@ -6,10 +6,10 @@ import path from "path";
 import os from "os";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
-import nodemailer from "nodemailer";
 import { Server } from "socket.io";
 import http from "http";
 import { setIO } from "./utils/socketManager.js";
+import { isEmailConfigured, verifyEmailConfig } from "./utils/send.Email.js";
 
 /* =======================
    🔧 Configurations
@@ -20,29 +20,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-const verifyEmailConfig = () => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("❌ Email credentials missing!");
-    return false;
-  }
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  transporter.verify((error) => {
-    if (error) {
-      console.error("❌ Email Error:", error.message);
-    }
-  });
-
-  return true;
-};
 
 /* =======================
    📦 Routes
@@ -226,10 +203,7 @@ app.get("/health", (req, res) => {
 
     "🔗 Services Status": {
       Database: dbStatusMap[dbState],
-      Email:
-        process.env.EMAIL_USER && process.env.EMAIL_PASS
-          ? "✅ Working"
-          : "❌ Not Configured",
+      Email: isEmailConfigured() ? "✅ Working" : "❌ Not Configured",
       Cloudinary: process.env.CLOUDINARY_CLOUD_NAME
         ? "✅ Connected"
         : "❌ Not Configured",

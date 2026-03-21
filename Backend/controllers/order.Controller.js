@@ -2,61 +2,9 @@ import { Order } from "../models/order.model.js";
 import Cart from "../models/cart.model.js";
 import User from "../models/user.model.js";
 import { Product } from "../models/product.model.js";
-import nodemailer from "nodemailer";
 import { getIO } from "../utils/socketManager.js";
 import { isValidName, isValidPhone, isValidPincode, normalizeWhitespace } from "../utils/validation.js";
-
-// Singleton transporter instance - reuse across all requests
-let transporterInstance = null;
-
-const getTransporter = () => {
-  if (transporterInstance) return transporterInstance;
-  
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("❌ Email credentials missing in .env!");
-    return null;
-  }
-  
-  transporterInstance = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-  
-  return transporterInstance;
-};
-
-// Send email asynchronously without blocking the response
-const sendEmailAsync = (mailOptions) => {
-  try {
-    const transporter = getTransporter();
-    
-    if (!transporter) {
-      console.error("❌ Transporter not initialized. Missing email credentials in .env");
-      return;
-    }
-    
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("❌ Email Sending Error Details:", {
-          message: error.message,
-          code: error.code,
-          command: error.command,
-          to: mailOptions.to,
-          timestamp: new Date().toISOString()
-        });
-        
-        if (error.code === 'EAUTH') {
-          console.error("💡 TIP: Check if EMAIL_USER and EMAIL_PASS are correct. If using Gmail, ensure you're using an App Password.");
-        }
-      }
-    });
-  } catch (err) {
-    console.error("❌ Error in sendEmailAsync:", err.message);
-  }
-};
+import { sendEmailAsync } from "../utils/send.Email.js";
 
 const sendOrderEmails = (order, userEmail) => {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@gmail.com";
@@ -108,14 +56,12 @@ const sendOrderEmails = (order, userEmail) => {
 
   // Send emails asynchronously (non-blocking)
   sendEmailAsync({
-    from: process.env.EMAIL_USER,
     to: userEmail,
     subject: `Order Receipt - MaurMart #${order._id.toString().substring(0, 8)}`,
     html: emailTemplate("Your Order Receipt", order.shippingAddress.name),
   });
 
   sendEmailAsync({
-    from: process.env.EMAIL_USER,
     to: adminEmail,
     subject: `New Order Received - MaurMart #${order._id.toString().substring(0, 8)}`,
     html: emailTemplate("New Order Details", "Admin"),

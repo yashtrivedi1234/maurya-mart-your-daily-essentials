@@ -1,11 +1,11 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import path from "path";
 import { fileURLToPath } from "url";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 import { isValidEmail, isValidName, isValidOtp, isValidPassword, isValidPhone, isValidPincode, normalizeEmail, normalizeWhitespace } from "../utils/validation.js";
+import { sendEmailAsync } from "../utils/send.Email.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,58 +15,6 @@ const getUserIdFromReq = (req) => {
   if (!req || !req.user) return null;
   return req.user.id || req.user._id || req.user.userId || null;
 };
-
-// Singleton transporter instance - reuse across all requests
-let transporterInstance = null;
-
-const getTransporter = () => {
-  if (transporterInstance) return transporterInstance;
-  
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("❌ Email credentials missing in .env!");
-    return null;
-  }
-  
-  transporterInstance = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-  
-  return transporterInstance;
-};
-
-// Send email asynchronously without blocking the response
-const sendEmailAsync = (mailOptions) => {
-  try {
-    const transporter = getTransporter();
-    
-    if (!transporter) {
-      console.error("❌ Transporter not initialized. Missing email credentials in .env");
-      console.error("   EMAIL_USER:", process.env.EMAIL_USER ? "SET" : "NOT SET");
-      console.error("   EMAIL_PASS:", process.env.EMAIL_PASS ? "SET" : "NOT SET");
-      return;
-    }
-    
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("❌ EMAIL FAILED - Check Render environment variables:", {
-          message: error.message,
-          code: error.code,
-          to: mailOptions.to,
-          from: mailOptions.from,
-          timestamp: new Date().toISOString(),
-          suggestion: "Verify EMAIL_USER and EMAIL_PASS on Render dashboard"
-        });
-      }
-    });
-  } catch (err) {
-    console.error("❌ Error in sendEmailAsync:", err.message);
-  }
-};
-
 
 export const registerUser = async (req, res) => {
   const name = normalizeWhitespace(req.body.name);
@@ -190,7 +138,6 @@ export const loginUser = async (req, res) => {
 
     // Send email asynchronously (non-blocking)
     sendEmailAsync({
-      from: process.env.EMAIL_USER,
       to: email,
       subject: "Login Verification Code - MaurMart",
       html: `
@@ -229,7 +176,6 @@ export const resendOtp = async (req, res) => {
 
     // Send email asynchronously (non-blocking)
     sendEmailAsync({
-      from: process.env.EMAIL_USER,
       to: email,
       subject: "Your New Verification Code - MaurMart",
       html: `
@@ -388,7 +334,6 @@ export const forgotPassword = async (req, res) => {
 
     // Send email asynchronously (non-blocking)
     sendEmailAsync({
-      from: process.env.EMAIL_USER,
       to: email,
       subject: "Password Reset Code - MaurMart",
       html: `
