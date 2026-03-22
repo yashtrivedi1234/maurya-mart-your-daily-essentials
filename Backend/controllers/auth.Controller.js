@@ -417,26 +417,43 @@ export const googleLogin = async (req, res) => {
     }
 
     let user = await User.findOne({ email });
+    const isNewUser = !user;
+
+    const normalizedGoogleName = (name || email.split("@")[0])
+      .replace(/[^A-Za-z ]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim() || "User";
     
-    if (!user) {
+    if (isNewUser) {
       // Create new user from Google data
       user = await User.create({
-        name: name || email.split("@")[0],
+        name: normalizedGoogleName,
         email,
         password: bcrypt.hashSync(Math.random().toString(36).slice(-10), 10), // Random password
         isVerified: true, // Google verified email
-        profilePic: picture || null,
+        profilePic: picture || "",
         googleId: email, // Store Google email as google ID
+        hasPasswordSet: false,
       });
     } else {
       // Update user profile if they have new data
+      let shouldSaveUser = false;
+
       if (!user.profilePic && picture) {
         user.profilePic = picture;
+        shouldSaveUser = true;
       }
       if (!user.isVerified) {
         user.isVerified = true;
+        shouldSaveUser = true;
       }
-      await user.save();
+      if (!user.googleId) {
+        user.googleId = email;
+        shouldSaveUser = true;
+      }
+      if (shouldSaveUser) {
+        await user.save({ validateModifiedOnly: true });
+      }
     }
 
     // Create JWT token
@@ -447,7 +464,7 @@ export const googleLogin = async (req, res) => {
     );
 
     res.json({
-      message: user ? "Welcome back!" : "Account created successfully",
+      message: isNewUser ? "Account created successfully" : "Welcome back!",
       token,
       user: {
         id: user._id,

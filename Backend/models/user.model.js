@@ -33,7 +33,10 @@ const userSchema = new mongoose.Schema(
       default: "",
       trim: true,
       validate: {
-        validator: (value) => !value || /^[6-9]\d{9}$/.test(value),
+        validator: (value) => {
+          const normalizedValue = typeof value === "string" ? value.trim() : value;
+          return !normalizedValue || /^[6-9]\d{9}$/.test(normalizedValue);
+        },
         message: "Phone number must be 10 digits and start with 6 to 9",
       },
     },
@@ -52,7 +55,10 @@ const userSchema = new mongoose.Schema(
       default: "",
       trim: true,
       validate: {
-        validator: (value) => !value || /^\d{6}$/.test(value),
+        validator: (value) => {
+          const normalizedValue = typeof value === "string" ? value.trim() : value;
+          return !normalizedValue || /^\d{6}$/.test(normalizedValue);
+        },
         message: "Pincode must be 6 digits",
       },
     },
